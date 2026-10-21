@@ -1,4 +1,4 @@
-# DIGIPUS
+# Salurin
 
 ## Instalasi
 
