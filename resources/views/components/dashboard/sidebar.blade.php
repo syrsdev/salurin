@@ -40,43 +40,49 @@
                 </svg>
                 <span>Dashboard</span>
             </a>
+            @if (auth()->user()->role == 'petugas')
+                <span class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs text-blue-200/80"
+                    aria-disabled="true">
+                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.8" aria-hidden="true">
+                        <circle cx="9" cy="8" r="3" />
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3.5 19a5.5 5.5 0 0 1 11 0M16 5.5a3 3 0 0 1 0 5.8M17 14a5 5 0 0 1 3.5 4.8" />
+                    </svg>
+                    <span>Data Penerima</span>
+                </span>
 
-            <span class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs text-blue-200/80" aria-disabled="true">
-                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="1.8" aria-hidden="true">
-                    <circle cx="9" cy="8" r="3" />
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M3.5 19a5.5 5.5 0 0 1 11 0M16 5.5a3 3 0 0 1 0 5.8M17 14a5 5 0 0 1 3.5 4.8" />
-                </svg>
-                <span>Data Penerima</span>
-            </span>
+                <span class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs text-blue-200/80"
+                    aria-disabled="true">
+                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.8" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5m-18 5 9 5 9-5" />
+                    </svg>
+                    <span>Jenis Bantuan</span>
+                </span>
 
-            <span class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs text-blue-200/80" aria-disabled="true">
-                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="1.8" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5m-18 5 9 5 9-5" />
-                </svg>
-                <span>Jenis Bantuan</span>
-            </span>
+                <span class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs text-blue-200/80"
+                    aria-disabled="true">
+                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.8" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M5 4h14a2 2 0 0 1 2 2v14l-4-2H7a2 2 0 0 1-2-2V4Zm4 5h6m-6 4h4" />
+                    </svg>
+                    <span>Penyaluran Bantuan</span>
+                </span>
 
-            <span class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs text-blue-200/80" aria-disabled="true">
-                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="1.8" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M5 4h14a2 2 0 0 1 2 2v14l-4-2H7a2 2 0 0 1-2-2V4Zm4 5h6m-6 4h4" />
-                </svg>
-                <span>Penyaluran Bantuan</span>
-            </span>
+                <span class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs text-blue-200/80"
+                    aria-disabled="true">
+                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.8" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 5h16v12H8l-4 3V5Z" />
+                    </svg>
+                    <span class="flex-1">Pengaduan Masuk</span>
+                    <span class="rounded bg-blue-800 px-1.5 py-0.5 text-[9px] font-semibold text-blue-100">11</span>
+                </span>
+            @endif
 
-            <span class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs text-blue-200/80" aria-disabled="true">
-                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="1.8" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 5h16v12H8l-4 3V5Z" />
-                </svg>
-                <span class="flex-1">Pengaduan Masuk</span>
-                <span class="rounded bg-blue-800 px-1.5 py-0.5 text-[9px] font-semibold text-blue-100">11</span>
-            </span>
         </div>
     </nav>
 
