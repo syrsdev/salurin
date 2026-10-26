@@ -14,17 +14,10 @@ return new class extends Migration
         Schema::create('tanggapan', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('id_pengaduan')->constrained('pengaduan');
-            $table->foreignId('id_pengguna')->constrained('users');
+            $table->foreignId('id_pengaduan')->constrained('pengaduan')->cascadeOnDelete();
+            $table->foreignId('id_pengguna')->constrained('users')->restrictOnDelete();
             $table->text('isi_tanggapan');
             $table->dateTime('waktu')->useCurrent();
-
-            // $table->foreign('id_pengaduan')
-            //     ->references('id_pengaduan')->on('pengaduan')
-            //     ->cascadeOnDelete();
-            // $table->foreign('id_pengguna')
-            //     ->references('id')->on('users')
-            //     ->restrictOnDelete();
             $table->timestamps();
         });
     }

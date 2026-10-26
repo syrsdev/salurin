@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('pengaduan', function (Blueprint $table) {
             $table->id();
             $table->string('kode_tiket', 30)->unique();
-            $table->foreignId('id_penerima')->constrained('penerima');
-            $table->foreignId('id_penyaluran')->constrained('penyaluran');
-            $table->foreignId('ditangani_oleh')->constrained('users');
+            $table->foreignId('id_penerima')->nullable()->constrained('penerima')->nullOnDelete();
+            $table->foreignId('id_penyaluran')->nullable()->constrained('penyaluran')->nullOnDelete();
+            $table->foreignId('ditangani_oleh')->nullable()->constrained('users')->nullOnDelete();
 
             // nilai: belum_cair | salah_sasaran | data_salah | lainnya
             $table->string('kategori', 50)->nullable();
@@ -26,15 +26,6 @@ return new class extends Migration
             $table->dateTime('tgl_pengaduan')->useCurrent();
             $table->dateTime('tgl_tanggapan')->nullable();
 
-            // $table->foreign('id_penerima')
-            //     ->references('id_penerima')->on('penerima')
-            //     ->nullOnDelete();
-            // $table->foreign('id_penyaluran')
-            //     ->references('id_penyaluran')->on('penyaluran')
-            //     ->nullOnDelete();
-            // $table->foreign('ditangani_oleh')
-            //     ->references('id')->on('users')
-            //     ->nullOnDelete();
             $table->timestamps();
         });
     }

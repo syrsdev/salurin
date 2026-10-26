@@ -22,8 +22,8 @@ return new class extends Migration
             $table->string('status_data', 20)->default('menunggu');
             $table->dateTime('tgl_disetujui')->nullable();
 
-            $table->foreignId('id_wilayah')->constrained('wilayah');
-            $table->foreignId('dibuat_oleh')->constrained('users');
+            $table->foreignId('id_wilayah')->constrained('wilayah')->restrictOnDelete();
+            $table->foreignId('dibuat_oleh')->constrained('users')->restrictOnDelete();
             $table->foreignId('disetujui_oleh')->nullable()->constrained('users')->nullOnDelete();
         });
     }

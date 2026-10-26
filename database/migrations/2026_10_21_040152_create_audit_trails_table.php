@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('audit_trail', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_pengguna')->constrained('users');
+            $table->foreignId('id_pengguna')->constrained('users')->restrictOnDelete();
             $table->string('nama_tabel', 50);
             $table->unsignedInteger('id_record');
             // nilai: create | update | delete
@@ -21,11 +21,6 @@ return new class extends Migration
             $table->json('data_lama')->nullable();
             $table->json('data_baru')->nullable();
             $table->dateTime('waktu')->useCurrent();
-
-            // restrict: log audit tidak boleh hilang walau akun pengguna dihapus
-            // $table->foreign('id_pengguna')
-            //     ->references('id')->on('users')
-            //     ->restrictOnDelete();
             $table->timestamps();
         });
     }

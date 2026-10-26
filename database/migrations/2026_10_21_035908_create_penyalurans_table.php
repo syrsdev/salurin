@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('penyaluran', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_penerima')->constrained('penerima');
-            $table->foreignId('id_bantuan')->constrained('jenis_bantuan');
-            $table->foreignId('id_periode')->constrained('periode');
-            $table->foreignId('id_pengguna')->constrained('users');
+            $table->foreignId('id_penerima')->constrained('penerima')->restrictOnDelete();
+            $table->foreignId('id_bantuan')->constrained('jenis_bantuan')->restrictOnDelete();
+            $table->foreignId('id_periode')->constrained('periode')->restrictOnDelete();
+            $table->foreignId('id_pengguna')->constrained('users')->restrictOnDelete();
 
             // nilai: terdaftar | diverifikasi | dijadwalkan | cair
             $table->string('status_penyaluran', 20)->default('terdaftar');
