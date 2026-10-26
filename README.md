@@ -25,6 +25,8 @@ Salin file .env.example
 
 ```bash
   cp .env.example .env
+
+  php artisan key:generate
 ```
 
 Buat database dan hubungkan di file .env
@@ -44,8 +46,5 @@ Jalankan migrasi
 Jalankan server
 
 ```bash
-  php artisan key:generate
-  php artisan serve
-  # start di terminal lain
-  npm run dev
+  composer run dev
 ```
