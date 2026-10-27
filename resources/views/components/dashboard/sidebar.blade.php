@@ -41,23 +41,30 @@
                 <span>Dashboard</span>
             </a>
             @if (auth()->user()->role == 'petugas')
-                <span class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs text-blue-200/80"
-                    aria-disabled="true">
+                <a href="{{ route('penerima.index') }}" x-on:click="sidebarOpen = false" @class([
+                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition',
+                    'bg-blue-800 text-white shadow-sm' => request()->routeIs('penerima.*'),
+                    'text-blue-100 hover:bg-white/10 hover:text-white' => !request()->routeIs(
+                        'penerima.*'),
+                ])
+                    @if (request()->routeIs('penerima.*')) aria-current="page" @endif>
+
                     <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="1.8" aria-hidden="true">
                         <circle cx="9" cy="8" r="3" />
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M3.5 19a5.5 5.5 0 0 1 11 0M16 5.5a3 3 0 0 1 0 5.8M17 14a5 5 0 0 1 3.5 4.8" />
                     </svg>
-                    <span>Data Penerima</span>
-                </span>
 
-                <a href="{{ route('jenis-bantuan.index') }}" @click="sidebarOpen = false"
-                    @class([
-                        'flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition',
-                        'bg-blue-800 text-white shadow-sm' => request()->routeIs('jenis-bantuan.*'),
-                        'text-blue-100 hover:bg-white/10 hover:text-white' => !request()->routeIs('jenis-bantuan.*'),
-                    ])>
+                    <span>Data Penerima</span>
+                </a>
+
+                <a href="{{ route('jenis-bantuan.index') }}" @click="sidebarOpen = false" @class([
+                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition',
+                    'bg-blue-800 text-white shadow-sm' => request()->routeIs('jenis-bantuan.*'),
+                    'text-blue-100 hover:bg-white/10 hover:text-white' => !request()->routeIs(
+                        'jenis-bantuan.*'),
+                ])>
                     <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="1.8" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round"
