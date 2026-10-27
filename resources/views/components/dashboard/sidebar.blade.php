@@ -52,15 +52,19 @@
                     <span>Data Penerima</span>
                 </span>
 
-                <span class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs text-blue-200/80"
-                    aria-disabled="true">
+                <a href="{{ route('jenis-bantuan.index') }}" @click="sidebarOpen = false"
+                    @class([
+                        'flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition',
+                        'bg-blue-800 text-white shadow-sm' => request()->routeIs('jenis-bantuan.*'),
+                        'text-blue-100 hover:bg-white/10 hover:text-white' => !request()->routeIs('jenis-bantuan.*'),
+                    ])>
                     <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="1.8" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5m-18 5 9 5 9-5" />
                     </svg>
                     <span>Jenis Bantuan</span>
-                </span>
+                </a>
 
                 <span class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs text-blue-200/80"
                     aria-disabled="true">
