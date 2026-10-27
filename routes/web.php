@@ -15,6 +15,7 @@ Route::get('/pengaduan', [PengaduanController::class, 'create'])->name('pengadua
 Route::post('/pengaduan', [PengaduanController::class, 'store'])->middleware('throttle:10,1')->name('pengaduan.store');
 Route::get('/pengaduan/cari', [PengaduanController::class, 'cari'])->middleware('throttle:30,1')->name('pengaduan.cari');
 Route::get('/transparansi', [PublicDashboardController::class, 'index'])->name('transparansi');
+Route::get('/pengaduan/sukses/{kode}', [PengaduanController::class, 'sukses'])->name('pengaduan.sukses');
 
 Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], function () {
     Route::get('/', function () {
