@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PenerimaController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\JenisBantuanController;
 use App\Http\Controllers\PublicDashboardController;
@@ -30,5 +31,9 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->prefix('dashboard')->group(function () {
     Route::resource('jenis-bantuan', JenisBantuanController::class)->except(['show']);
 });
+
+Route::get('/dashboard/penerima', [PenerimaController::class, 'index'])
+    ->middleware(['auth', 'role:petugas'])
+    ->name('penerima.index');
 
 require __DIR__.'/auth.php';
