@@ -6,6 +6,8 @@ use App\Http\Controllers\JenisBantuanController;
 use App\Http\Controllers\PengaduanController;
 use App\Http\Controllers\PublicDashboardController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\PenerimaPersetujuanController;
+use App\Http\Controllers\Api\PenyaluranController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -40,5 +42,23 @@ Route::middleware('auth')->prefix('dashboard')->group(function () {
 Route::get('/dashboard/penerima', [PenerimaController::class, 'index'])
     ->middleware(['auth', 'role:petugas'])
     ->name('penerima.index');
+
+    Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
+
+    // Kepala Desa: setujui / tolak data penerima
+    Route::middleware('role:kepala_desa')->prefix('persetujuan-penerima')->name('persetujuan.')->group(function () {
+        Route::get('/', [PenerimaPersetujuanController::class, 'index'])->name('index');
+        Route::get('/{id}', [PenerimaPersetujuanController::class, 'show'])->name('show');
+        Route::patch('/{id}/setujui', [PenerimaPersetujuanController::class, 'setujui'])->name('setujui');
+        Route::patch('/{id}/tolak', [PenerimaPersetujuanController::class, 'tolak'])->name('tolak');
+    });
+
+    // Petugas Desa: daftar penyaluran + ubah status
+    Route::middleware('role:petugas')->prefix('penyaluran')->name('penyaluran.')->group(function () {
+        Route::get('/', [PenyaluranController::class, 'index'])->name('index');
+        Route::get('/{id}', [PenyaluranController::class, 'show'])->name('show');
+        Route::patch('/{id}/status', [PenyaluranController::class, 'ubahStatus'])->name('status');
+    });
+});
 
 require __DIR__.'/auth.php';
