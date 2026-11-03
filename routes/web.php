@@ -1,13 +1,13 @@
 <?php
 
-use App\Http\Controllers\PenerimaController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\JenisBantuanController;
-use App\Http\Controllers\PengaduanController;
-use App\Http\Controllers\PublicDashboardController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\PenerimaPersetujuanController;
 use App\Http\Controllers\Api\PenyaluranController;
+use App\Http\Controllers\JenisBantuanController;
+use App\Http\Controllers\PenerimaController;
+use App\Http\Controllers\PengaduanController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicDashboardController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
@@ -24,6 +24,9 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], fu
         return view('pages.dashboard');
     })->name('dashboard');
 
+    Route::middleware(['role:petugas'])->group(function () {
+        Route::resource('penerima', PenerimaController::class)->except(['show']);
+    });
     // Route::middleware('role:petugas')->group(function () {
 
     // });
@@ -39,11 +42,8 @@ Route::middleware('auth')->prefix('dashboard')->group(function () {
     Route::resource('jenis-bantuan', JenisBantuanController::class)->except(['show']);
 });
 
-Route::get('/dashboard/penerima', [PenerimaController::class, 'index'])
-    ->middleware(['auth', 'role:petugas'])
-    ->name('penerima.index');
 
-    Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
+Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
 
     // Kepala Desa: setujui / tolak data penerima
     Route::middleware('role:kepala_desa')->prefix('persetujuan-penerima')->name('persetujuan.')->group(function () {
