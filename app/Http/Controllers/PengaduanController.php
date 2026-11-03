@@ -48,9 +48,7 @@ class PengaduanController extends Controller
             return back()->withInput()->with('error', 'Gagal membuat tiket, silakan coba lagi.');
         }
 
-        return redirect()->route('pengaduan.create')
-            ->with('success', 'Pengaduan berhasil disimpan.')
-            ->with('kode_tiket', $pengaduan->kode_tiket);
+        return redirect()->route('pengaduan.sukses', $pengaduan->kode_tiket);
     }
 
     public function cari(Request $request): View
@@ -63,5 +61,12 @@ class PengaduanController extends Controller
         }
 
         return view('pages.pengaduan.cari', compact('kode', 'pengaduan'));
+    }
+
+        public function sukses(string $kode): View
+    {
+        $pengaduan = Pengaduan::where('kode_tiket', $kode)->firstOrFail();
+
+        return view('pages.pengaduan.sukses', compact('pengaduan'));
     }
 }
