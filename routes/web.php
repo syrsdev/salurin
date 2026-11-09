@@ -38,6 +38,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// Halaman frontend persetujuan data penerima untuk Kepala Desa.
+Route::get('/dashboard/persetujuan-penerima', function () {
+    return view('pages.persetujuan.index');
+})->middleware(['auth', 'verified', 'role:kepala_desa'])
+  ->name('persetujuan-penerima.page');
+
 Route::middleware('auth')->prefix('dashboard')->group(function () {
     Route::resource('jenis-bantuan', JenisBantuanController::class)->except(['show']);
 });
