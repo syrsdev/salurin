@@ -40,6 +40,21 @@
                 </svg>
                 <span>Dashboard</span>
             </a>
+            @if (auth()->user()->role == 'kepala_desa')
+                <a href="{{ route('persetujuan-penerima.page') }}" x-on:click="sidebarOpen = false" @class([
+                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition',
+                    'bg-blue-800 text-white shadow-sm' => request()->routeIs('persetujuan-penerima.page'),
+                    'text-blue-100 hover:bg-white/10 hover:text-white' => !request()->routeIs('persetujuan-penerima.page'),
+                ]) @if (request()->routeIs('persetujuan-penerima.page')) aria-current="page" @endif>
+                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.8" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M8 7h8m-8 4h8m-8 4h5M5 3h14a2 2 0 0 1 2 2v14l-4-2H7l-4 2V5a2 2 0 0 1 2-2Z" />
+                    </svg>
+                    <span>Persetujuan Data</span>
+                </a>
+            @endif
+
             @if (auth()->user()->role == 'petugas')
                 <a href="{{ route('penerima.index') }}" x-on:click="sidebarOpen = false" @class([
                     'flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition',
@@ -105,7 +120,7 @@
             </span>
             <span class="flex-1 min-w-0">
                 <span class="block truncate text-[11px] font-semibold text-white">{{ Auth::user()->name }}</span>
-                <span class="mt-0.5 block truncate text-[9px] text-blue-200">Petugas Desa/Kelurahan</span>
+                <span class="mt-0.5 block truncate text-[9px] text-blue-200">{{ auth()->user()->role === 'kepala_desa' ? 'Kepala Desa' : (auth()->user()->role === 'admin' ? 'Administrator' : 'Petugas Desa/Kelurahan') }}</span>
             </span>
             <a href="{{ route('profile.edit') }}" class="p-1 text-blue-200 rounded hover:bg-white/10 hover:text-white"
                 aria-label="Buka profil">

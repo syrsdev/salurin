@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create(); 
+        // User::factory(10)->create();
         Wilayah::create([
             'provinsi' => 'Jawa Barat',
             'kabupaten_kota' => 'Kabupaten Contoh',
@@ -25,12 +25,20 @@ class DatabaseSeeder extends Seeder
             'rw' => '01',
             'rt' => '01'
         ]);
-        
+
         User::create([
             'name' => 'Petugas',
             'email' => 'petugas@gmail.com',
             'password' => bcrypt('password'),
             'role' => 'petugas',
+            'id_wilayah' => 1
+        ]);
+
+        User::create([
+            'name' => 'Kepala Desa',
+            'email' => 'kades@gmail.com',
+            'password' => bcrypt('password'),
+            'role' => 'kepala_desa',
             'id_wilayah' => 1
         ]);
     }
