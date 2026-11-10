@@ -7,6 +7,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-slate-50 font-sans text-slate-900 antialiased">
+    <x-public-navbar />
+
     <main class="mx-auto max-w-lg px-4 py-14">
         <div class="rounded-xl border border-slate-200 bg-white p-7 text-center shadow-sm">
             <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-green-700">
