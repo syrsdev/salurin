@@ -18,7 +18,11 @@
                 class="rounded-lg px-3 py-2 {{ request()->routeIs('transparansi') ? 'bg-blue-50 text-blue-900' : 'text-slate-600 hover:bg-slate-100' }}">
                 Dashboard Publik
             </a>
-            <a href="#" class="rounded-lg px-3 py-2 text-slate-600 hover:bg-slate-100">Cek Status Bantuan</a>
+            <a href="{{ route('cek-status-bantuan.index') }}"
+                @if (request()->routeIs('cek-status-bantuan.*')) aria-current="page" @endif
+                class="rounded-lg px-3 py-2 {{ request()->routeIs('cek-status-bantuan.*') ? 'bg-blue-50 text-blue-900' : 'text-slate-600 hover:bg-slate-100' }}">
+                Cek Status Bantuan
+            </a>
             <a href="{{ route('pengaduan.create') }}"
                 @if (request()->routeIs('pengaduan.*')) aria-current="page" @endif
                 class="rounded-lg px-3 py-2 {{ request()->routeIs('pengaduan.*') ? 'bg-blue-50 text-blue-900' : 'text-slate-600 hover:bg-slate-100' }}">
