@@ -105,15 +105,20 @@
                     <span>Penyaluran Bantuan</span>
                 </a>
 
-                <span class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs text-blue-200/80"
-                    aria-disabled="true">
+                <a href="{{ route('dashboard.pengaduan.index') }}" x-on:click="sidebarOpen = false" @class([
+                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition',
+                    'bg-blue-800 text-white shadow-sm' => request()->routeIs('dashboard.pengaduan.*'),
+                    'text-blue-100 hover:bg-white/10 hover:text-white' => !request()->routeIs('dashboard.pengaduan.*'),
+                ]) @if (request()->routeIs('dashboard.pengaduan.*')) aria-current="page" @endif>
                     <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="1.8" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 5h16v12H8l-4 3V5Z" />
                     </svg>
                     <span class="flex-1">Pengaduan Masuk</span>
-                    <span class="rounded bg-blue-800 px-1.5 py-0.5 text-[9px] font-semibold text-blue-100">11</span>
-                </span>
+                    @if ($pengaduanBaru > 0)
+                        <span class="rounded bg-blue-800 px-1.5 py-0.5 text-[9px] font-semibold text-blue-100">{{ $pengaduanBaru }}</span>
+                    @endif
+                </a>
             @endif
 
         </div>
