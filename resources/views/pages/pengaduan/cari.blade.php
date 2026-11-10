@@ -27,6 +27,7 @@
                     <table class="w-full text-left text-sm">
                         <tbody class="divide-y divide-slate-100">
                             <tr><th class="w-40 bg-slate-50 px-5 py-3 font-semibold text-slate-600">Kode Tiket</th><td class="px-5 py-3 font-bold">{{ $pengaduan->kode_tiket }}</td></tr>
+                            <tr><th class="bg-slate-50 px-5 py-3 font-semibold text-slate-600">Wilayah</th><td class="px-5 py-3">{{ $pengaduan->wilayah ? $pengaduan->wilayah->kelurahan_desa.' — '.$pengaduan->wilayah->kecamatan : 'Belum ditentukan' }}</td></tr>
                             <tr><th class="bg-slate-50 px-5 py-3 font-semibold text-slate-600">Kategori</th><td class="px-5 py-3">{{ \App\Models\Pengaduan::KATEGORI[$pengaduan->kategori] ?? '-' }}</td></tr>
                             <tr><th class="bg-slate-50 px-5 py-3 font-semibold text-slate-600">Isi Pengaduan</th><td class="whitespace-pre-line px-5 py-3">{{ $pengaduan->isi_pengaduan }}</td></tr>
                             <tr><th class="bg-slate-50 px-5 py-3 font-semibold text-slate-600">Status</th><td class="px-5 py-3 font-semibold text-blue-800">{{ \App\Models\Pengaduan::STATUS[$pengaduan->status_pengaduan] ?? $pengaduan->status_pengaduan }}</td></tr>
@@ -35,6 +36,19 @@
                         </tbody>
                     </table>
                 </div>
+                <section class="mt-6" aria-labelledby="tanggapan-title">
+                    <h2 id="tanggapan-title" class="text-lg font-bold text-slate-900">Tanggapan</h2>
+                    @forelse ($pengaduan->tanggapans as $tanggapan)
+                        <article class="mt-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                            <p class="text-xs text-slate-500">{{ $tanggapan->waktu?->format('d-m-Y H:i') }}</p>
+                            <p class="mt-2 whitespace-pre-line text-sm text-slate-800">{{ $tanggapan->isi_tanggapan }}</p>
+                        </article>
+                    @empty
+                        <p class="mt-2 rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-500">
+                            Belum ada tanggapan. Silakan cek kembali nanti.
+                        </p>
+                    @endforelse
+                </section>
             @else
                 <div role="alert" class="mt-6 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">Pengaduan dengan kode tiket tersebut tidak ditemukan.</div>
             @endif
