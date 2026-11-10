@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\PenerimaPersetujuanController;
 use App\Http\Controllers\Api\PenyaluranController;
 use App\Http\Controllers\CekStatusBantuanController;
+use App\Http\Controllers\Dashboard\PengaduanController as DashboardPengaduanController;
 use App\Http\Controllers\JenisBantuanController;
 use App\Http\Controllers\PenerimaController;
 use App\Http\Controllers\PengaduanController;
@@ -31,6 +32,11 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], fu
 
     Route::middleware(['role:petugas'])->group(function () {
         Route::resource('penerima', PenerimaController::class)->except(['show']);
+        Route::get('/pengaduan', [DashboardPengaduanController::class, 'index'])->name('dashboard.pengaduan.index');
+        Route::get('/pengaduan/{pengaduan}', [DashboardPengaduanController::class, 'show'])->name('dashboard.pengaduan.show');
+        Route::post('/pengaduan/{pengaduan}/tanggapan', [DashboardPengaduanController::class, 'store'])
+            ->middleware('throttle:20,1')
+            ->name('dashboard.pengaduan.tanggapan');
     });
     // Route::middleware('role:petugas')->group(function () {
 

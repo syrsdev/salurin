@@ -22,6 +22,18 @@
         <form method="POST" action="{{ route('pengaduan.store') }}" class="mt-6 space-y-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
             @csrf
             <div>
+                <label for="id_wilayah" class="mb-1.5 block text-sm font-semibold text-slate-700">Desa/Kelurahan <span class="text-red-600">*</span></label>
+                <select id="id_wilayah" name="id_wilayah" required class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600">
+                    <option value="">-- Pilih desa/kelurahan --</option>
+                    @foreach ($wilayahOptions as $wilayah)
+                        <option value="{{ $wilayah->id }}" @selected((string) old('id_wilayah') === (string) $wilayah->id)>
+                            {{ $wilayah->kelurahan_desa }} — {{ $wilayah->kecamatan }}
+                        </option>
+                    @endforeach
+                </select>
+                @error('id_wilayah') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+            </div>
+            <div>
                 <label for="kategori" class="mb-1.5 block text-sm font-semibold text-slate-700">Kategori <span class="text-red-600">*</span></label>
                 <select id="kategori" name="kategori" required class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600">
                     <option value="">-- Pilih kategori --</option>
