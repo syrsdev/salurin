@@ -31,6 +31,15 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], fu
 
     Route::middleware(['role:petugas'])->group(function () {
         Route::resource('penerima', PenerimaController::class)->except(['show']);
+
+        // SCRUM-267: halaman daftar dan detail penyaluran bantuan.
+        Route::get('/penyaluran', function () {
+            return view('pages.penyaluran.index');
+        })->name('penyaluran.page');
+
+        Route::get('/penyaluran/{id}', function (int $id) {
+            return view('pages.penyaluran.index', ['penyaluranId' => $id]);
+        })->whereNumber('id')->name('penyaluran.detail');
     });
     // Route::middleware('role:petugas')->group(function () {
 
@@ -66,9 +75,10 @@ Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
     // Petugas Desa: daftar penyaluran + ubah status
     Route::middleware('role:petugas')->prefix('penyaluran')->name('penyaluran.')->group(function () {
         Route::get('/', [PenyaluranController::class, 'index'])->name('index');
+        Route::get('/{id}/riwayat', [PenyaluranController::class, 'riwayat'])->name('riwayat');
         Route::get('/{id}', [PenyaluranController::class, 'show'])->name('show');
         Route::patch('/{id}/status', [PenyaluranController::class, 'ubahStatus'])->name('status');
     });
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

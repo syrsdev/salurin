@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AuditTrail extends Model
 {
@@ -40,5 +41,10 @@ class AuditTrail extends Model
             'data_baru'   => $baru,
             'waktu'       => now(),
         ]);
+    }
+
+    public function pengguna(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'id_pengguna');
     }
 }

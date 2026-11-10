@@ -30,7 +30,11 @@ class PenyaluranController extends Controller
         $search = trim($filters['search'] ?? '');
 
         $query = Penyaluran::query()
-            ->with('penerima:id,nik,nama_lengkap,status_data')
+            ->with([
+                'penerima:id,nik,nama_lengkap,status_data,alamat',
+                'jenisBantuan:id,nama_bantuan,nominal,deskripsi',
+                'periode:id,nama_periode,tgl_mulai,tgl_selesai',
+            ])
             ->whereHas('penerima', function ($q) use ($wilayahId, $search) {
                 $q->where('id_wilayah', $wilayahId);
 
@@ -54,11 +58,50 @@ class PenyaluranController extends Controller
     public function show(Request $request, int $id): JsonResponse
     {
         $penyaluran = $this->querySewilayah($this->wilayahId($request))
-            ->with('penerima:id,nik,nama_lengkap,status_data')
+            ->with([
+                'penerima:id,nik,nama_lengkap,status_data,alamat',
+                'jenisBantuan:id,nama_bantuan,nominal,deskripsi',
+                'periode:id,nama_periode,tgl_mulai,tgl_selesai',
+            ])
             ->where('id', $id)
             ->firstOrFail();
 
-        return response()->json(['data' => $penyaluran]);
+        return response()->json([
+            'data' => $penyaluran,
+        ]);
+    }
+
+    public function riwayat(Request $request, int $id): JsonResponse
+    {
+        // Pastikan penyaluran berada di wilayah tugas petugas.
+        $penyaluran = $this->querySewilayah($this->wilayahId($request))
+            ->where('id', $id)
+            ->firstOrFail();
+
+        // Ambil riwayat perubahan dari Audit Trail.
+        $riwayat = AuditTrail::query()
+            ->with('pengguna:id,name')
+            ->where('nama_tabel', 'penyaluran')
+            ->where('id_record', $penyaluran->id)
+            ->orderBy('waktu')
+            ->orderBy('id')
+            ->get();
+
+        $data = $riwayat->map(function ($audit) {
+            return [
+                'id' => $audit->id,
+                'status_sebelumnya' => $audit->data_lama['status_penyaluran'] ?? null,
+                'status_baru' => $audit->data_baru['status_penyaluran'] ?? null,
+                'tgl_penyaluran' => $audit->data_baru['tgl_penyaluran'] ?? null,
+                'catatan' => $audit->data_baru['catatan'] ?? null,
+                'waktu' => $audit->waktu,
+                'pengguna' => $audit->pengguna?->name,
+            ];
+        });
+
+        return response()->json([
+            'data' => $data,
+        ]);
     }
 
     public function ubahStatus(Request $request, int $id): JsonResponse
@@ -99,7 +142,11 @@ class PenyaluranController extends Controller
 
         return response()->json([
             'message' => 'Status penyaluran diperbarui.',
-            'data'    => $penyaluran->load('penerima:id,nik,nama_lengkap,status_data'),
+            'data' => $penyaluran->load([
+                'penerima:id,nik,nama_lengkap,status_data,alamat',
+                'jenisBantuan:id,nama_bantuan,nominal,deskripsi',
+                'periode:id,nama_periode,tgl_mulai,tgl_selesai',
+            ]),
         ]);
     }
 
