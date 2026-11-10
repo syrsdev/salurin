@@ -92,15 +92,18 @@
                     <span>Jenis Bantuan</span>
                 </a>
 
-                <span class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs text-blue-200/80"
-                    aria-disabled="true">
+                <a href="{{ route('penyaluran.page') }}" x-on:click="sidebarOpen = false" @class([
+                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition',
+                    'bg-blue-800 text-white shadow-sm' => request()->routeIs('penyaluran.*'),
+                    'text-blue-100 hover:bg-white/10 hover:text-white' => !request()->routeIs('penyaluran.*'),
+                ]) @if (request()->routeIs('penyaluran.*')) aria-current="page" @endif>
                     <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="1.8" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M5 4h14a2 2 0 0 1 2 2v14l-4-2H7a2 2 0 0 1-2-2V4Zm4 5h6m-6 4h4" />
                     </svg>
                     <span>Penyaluran Bantuan</span>
-                </span>
+                </a>
 
                 <a href="{{ route('dashboard.pengaduan.index') }}" x-on:click="sidebarOpen = false" @class([
                     'flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition',
