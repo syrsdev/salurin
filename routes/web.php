@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\PenerimaPersetujuanController;
 use App\Http\Controllers\Api\PenyaluranController;
+use App\Http\Controllers\CekStatusBantuanController;
 use App\Http\Controllers\JenisBantuanController;
 use App\Http\Controllers\PenerimaController;
 use App\Http\Controllers\PengaduanController;
@@ -17,6 +18,10 @@ Route::get('/pengaduan', [PengaduanController::class, 'create'])->name('pengadua
 Route::post('/pengaduan', [PengaduanController::class, 'store'])->middleware('throttle:10,1')->name('pengaduan.store');
 Route::get('/pengaduan/cari', [PengaduanController::class, 'cari'])->middleware('throttle:30,1')->name('pengaduan.cari');
 Route::get('/transparansi', [PublicDashboardController::class, 'index'])->name('transparansi');
+Route::get('/cek-status-bantuan', [CekStatusBantuanController::class, 'index'])->name('cek-status-bantuan.index');
+Route::post('/cek-status-bantuan/cari', [CekStatusBantuanController::class, 'cari'])
+    ->middleware('throttle:10,1')
+    ->name('cek-status-bantuan.cari');
 Route::get('/pengaduan/sukses/{kode}', [PengaduanController::class, 'sukses'])->name('pengaduan.sukses');
 
 Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], function () {
@@ -42,12 +47,11 @@ Route::middleware('auth')->group(function () {
 Route::get('/dashboard/persetujuan-penerima', function () {
     return view('pages.persetujuan.index');
 })->middleware(['auth', 'verified', 'role:kepala_desa'])
-  ->name('persetujuan-penerima.page');
+    ->name('persetujuan-penerima.page');
 
 Route::middleware('auth')->prefix('dashboard')->group(function () {
     Route::resource('jenis-bantuan', JenisBantuanController::class)->except(['show']);
 });
-
 
 Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
 

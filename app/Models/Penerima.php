@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Penerima extends Model
 {
@@ -33,8 +36,20 @@ class Penerima extends Model
     }
 
     // Relasi dipersiapkan untuk Issue 15; tidak mengubah struktur database.
-    public function wilayah(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function wilayah(): BelongsTo
     {
         return $this->belongsTo(wilayah::class, 'id_wilayah');
+    }
+
+    public function penyalurans(): HasMany
+    {
+        return $this->hasMany(Penyaluran::class, 'id_penerima');
+    }
+
+    public function scopeMatchingIdentity(Builder $query, string $nik, string $noKk, string $tanggalLahir): void
+    {
+        $query->where('nik', $nik)
+            ->where('no_kk', $noKk)
+            ->whereDate('tanggal_lahir', $tanggalLahir);
     }
 }

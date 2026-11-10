@@ -37,4 +37,14 @@ class Penyaluran extends Model
     {
         return $this->belongsTo(Penerima::class, 'id_penerima');
     }
+
+    public function jenisBantuan(): BelongsTo
+    {
+        return $this->belongsTo(JenisBantuan::class, 'id_bantuan');
+    }
+
+    public function periode(): BelongsTo
+    {
+        return $this->belongsTo(Periode::class, 'id_periode');
+    }
 }

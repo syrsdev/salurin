@@ -16,8 +16,12 @@
     <div class="px-3 pt-5">
         <div class="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-3">
             <p class="text-[9px] font-semibold uppercase tracking-wider text-blue-200">Wilayah operasional</p>
-            <p class="mt-1.5 text-xs font-semibold text-white">Desa Sukamaju</p>
-            <p class="mt-1 text-[10px] text-blue-200">Kecamatan Sukasari</p>
+            <p class="mt-1.5 text-xs font-semibold text-white">
+                {{ $wilayahOperasional ? 'Desa/Kelurahan '.$wilayahOperasional->kelurahan_desa : 'Wilayah belum diatur' }}
+            </p>
+            @if ($wilayahOperasional)
+                <p class="mt-1 text-[10px] text-blue-200">Kecamatan {{ $wilayahOperasional->kecamatan }}</p>
+            @endif
         </div>
     </div>
 
