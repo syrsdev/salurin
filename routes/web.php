@@ -40,7 +40,9 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], fu
             return view('pages.penyaluran.index');
         })->name('penyaluran.page');
 
-        Route::get('/periode', function () { return view('pages.periode.index'); })->name('periode.page');
+        Route::get('/periode', function () {
+            return view('pages.periode.index');
+        })->name('periode.page');
 
         Route::get('/penyaluran/{id}', function (int $id) {
             return view('pages.penyaluran.index', ['penyaluranId' => $id]);
@@ -77,6 +79,11 @@ Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
     // Kepala Desa: setujui / tolak data penerima
     Route::middleware('role:kepala_desa')->prefix('persetujuan-penerima')->name('persetujuan.')->group(function () {
         Route::get('/', [PenerimaPersetujuanController::class, 'index'])->name('index');
+
+        // Revisi dosen: persetujuan beberapa penerima sekaligus
+        Route::patch('/setujui-massal', [PenerimaPersetujuanController::class, 'setujuiMassal'])
+            ->name('setujui-massal');
+
         Route::get('/{id}', [PenerimaPersetujuanController::class, 'show'])->name('show');
         Route::patch('/{id}/setujui', [PenerimaPersetujuanController::class, 'setujui'])->name('setujui');
         Route::patch('/{id}/tolak', [PenerimaPersetujuanController::class, 'tolak'])->name('tolak');
@@ -100,4 +107,4 @@ Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
     });
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

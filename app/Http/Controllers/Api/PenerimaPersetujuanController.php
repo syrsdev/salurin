@@ -73,6 +73,38 @@ class PenerimaPersetujuanController extends Controller
         ]);
     }
 
+    /** Setujui beberapa pengajuan sekaligus dari wilayah kepala desa. */
+    public function setujuiMassal(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1', 'max:100'],
+            'ids.*' => ['required', 'integer', 'distinct', 'min:1'],
+        ]);
+        $ids = array_map('intval', $data['ids']);
+        $wilayahId = $this->wilayahId($request);
+
+        $jumlah = DB::transaction(function () use ($ids, $wilayahId, $request) {
+            $penerimas = Penerima::where('id_wilayah', $wilayahId)
+                ->whereIn('id', $ids)->orderBy('id')->lockForUpdate()->get();
+            abort_if($penerimas->count() !== count($ids), 422, 'Ada data yang tidak ditemukan di wilayah Anda.');
+            abort_if($penerimas->contains(fn ($p) => $p->status_data !== 'menunggu'), 409, 'Ada data yang sudah diproses. Muat ulang daftar.');
+
+            foreach ($penerimas as $penerima) {
+                $lama = $penerima->only(self::KOLOM_AUDIT);
+                $penerima->update([
+                    'status_data' => 'disetujui',
+                    'alasan_penolakan' => null,
+                    'tgl_disetujui' => now(),
+                    'disetujui_oleh' => $request->user()->id,
+                ]);
+                AuditTrail::catat('penerima', $penerima->id, 'update', $lama, $penerima->only(self::KOLOM_AUDIT));
+            }
+            return $penerimas->count();
+        });
+
+        return response()->json(['message' => "$jumlah data penerima berhasil disetujui.", 'jumlah' => $jumlah]);
+    }
+
     public function tolak(Request $request, int $id): JsonResponse
     {
         $data = $request->validate([
