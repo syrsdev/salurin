@@ -5,6 +5,7 @@
     <div id="approval-app"
         data-list-url="{{ route('api.persetujuan.index') }}"
         data-base-url="{{ url('/api/persetujuan-penerima') }}"
+        data-bulk-url="{{ route('api.persetujuan.setujui-massal') }}"
         class="space-y-5">
 
         <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -50,6 +51,17 @@
             <div class="flex items-center justify-between gap-3 px-4 py-3">
                 <p id="approval-summary" class="text-xs text-slate-500">Memuat pengajuan...</p>
                 <p id="approval-page-label" class="text-xs font-medium text-slate-500"></p>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-4 py-3">
+                <label class="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                    <input type="checkbox" id="approval-select-all" class="rounded border-slate-300 text-blue-700 focus:ring-blue-600">
+                    Pilih semua yang menunggu di halaman ini
+                </label>
+                <button type="button" id="approval-bulk-button" disabled
+                    class="rounded-lg bg-emerald-700 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50">
+                    Setujui Terpilih (0)
+                </button>
             </div>
 
             <div id="approval-list" class="grid gap-3 px-4 pb-4" aria-live="polite">
@@ -107,6 +119,11 @@
 
             const listUrl = root.dataset.listUrl;
             const baseUrl = root.dataset.baseUrl;
+            const bulkUrl = root.dataset.bulkUrl;
+            const selectedIds = new Set();
+            const selectAll = document.getElementById('approval-select-all');
+            const bulkButton = document.getElementById('approval-bulk-button');
+            let currentItems = [];
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
             const listEl = document.getElementById('approval-list');
             const alertEl = document.getElementById('approval-alert');
@@ -234,8 +251,21 @@
                 paginationInfoEl.textContent = `Menampilkan ${meta.from || 0}–${meta.to || 0} dari ${meta.total || 0} pengajuan`;
             }
 
+            function updateBulkControls() {
+                const eligible = currentItems.filter(item => item.status_data === 'menunggu');
+                const count = eligible.filter(item => selectedIds.has(Number(item.id))).length;
+                bulkButton.textContent = `Setujui Terpilih (${count})`;
+                bulkButton.disabled = count === 0;
+                selectAll.checked = eligible.length > 0 && count === eligible.length;
+                selectAll.indeterminate = count > 0 && count < eligible.length;
+                selectAll.disabled = eligible.length === 0;
+            }
+
             function renderCards(items) {
+                currentItems = items;
+                selectedIds.clear();
                 listEl.replaceChildren();
+                updateBulkControls();
                 if (!items.length) {
                     const empty = document.createElement('div');
                     empty.className = 'rounded-lg border border-dashed border-slate-300 p-10 text-center text-sm text-slate-500';
@@ -251,6 +281,7 @@
                     card.className = 'rounded-xl border border-slate-200 bg-white p-4 transition hover:border-blue-200 hover:shadow-sm sm:p-5';
                     card.innerHTML = `
                         <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                            ${status === 'menunggu' ? `<label class="flex shrink-0 items-center gap-2 text-xs font-medium text-slate-600"><input type="checkbox" class="approval-checkbox rounded border-slate-300 text-blue-700" data-id="${Number(item.id)}" aria-label="Pilih ${escapeHtml(item.nama_lengkap)}"></label>` : ''}
                             <div class="min-w-0 flex-1">
                                 <div class="flex flex-wrap items-center gap-2">
                                     <h2 class="text-base font-bold text-slate-900">${escapeHtml(item.nama_lengkap)}</h2>
@@ -278,11 +309,15 @@
                         </div>`;
                     listEl.append(card);
                 });
+                updateBulkControls();
             }
 
             async function load(page = 1) {
                 currentPage = Math.max(1, page);
                 hideAlert();
+                selectedIds.clear();
+                currentItems = [];
+                updateBulkControls();
                 listEl.innerHTML = '<div class="rounded-lg border border-slate-200 p-6 text-center text-sm text-slate-500">Memuat pengajuan...</div>';
 
                 const params = new URLSearchParams({ page: String(currentPage) });
@@ -348,12 +383,47 @@
                         method: 'PATCH',
                         body: JSON.stringify({})
                     });
-                    showAlert(result.message || 'Data penerima berhasil disetujui.');
                     await load(currentPage);
+                    showAlert(result.message || 'Data penerima berhasil disetujui.');
                 } catch (error) {
                     showAlert(error.message, 'error');
                 }
             }
+
+            selectAll.addEventListener('change', () => {
+                currentItems.filter(item => item.status_data === 'menunggu').forEach(item => {
+                    if (selectAll.checked) selectedIds.add(Number(item.id));
+                    else selectedIds.delete(Number(item.id));
+                });
+                listEl.querySelectorAll('.approval-checkbox').forEach(input => {
+                    input.checked = selectedIds.has(Number(input.dataset.id));
+                });
+                updateBulkControls();
+            });
+
+            listEl.addEventListener('change', event => {
+                if (!event.target.matches('.approval-checkbox')) return;
+                const id = Number(event.target.dataset.id);
+                if (event.target.checked) selectedIds.add(id);
+                else selectedIds.delete(id);
+                updateBulkControls();
+            });
+
+            bulkButton.addEventListener('click', async () => {
+                const ids = [...selectedIds];
+                if (!ids.length || !window.confirm(`Setujui ${ids.length} pengajuan terpilih?`)) return;
+                bulkButton.disabled = true;
+                try {
+                    const result = await apiFetch(bulkUrl, {
+                        method: 'PATCH', body: JSON.stringify({ ids })
+                    });
+                    await load(currentPage);
+                    showAlert(result.message || 'Data terpilih berhasil disetujui.');
+                } catch (error) {
+                    showAlert(error.message, 'error');
+                    updateBulkControls();
+                }
+            });
 
             function openReject(id) {
                 rejectingId = id;
