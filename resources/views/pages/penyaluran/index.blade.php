@@ -12,6 +12,8 @@
                 <p id="page-description" class="mt-1 text-sm text-slate-500">Pantau perkembangan penyaluran bantuan di
                     wilayah tugas.</p>
             </div>
+            <a href="{{ route('periode.page') }}" class="rounded-lg border border-blue-300 px-4 py-2 text-sm font-semibold text-blue-700">Kelola Periode</a>
+            @if(empty($penyaluranId))<button type="button" id="tambah-buka" class="rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white">+ Tambah Penyaluran</button>@endif
             <button type="button" id="reload-button"
                 class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
                 Muat ulang
@@ -20,6 +22,17 @@
 
         <div id="page-alert" class="hidden rounded-lg border p-3 text-sm" role="status" aria-live="polite"></div>
 
+        <div id="penyaluran-tambah-panel" class="hidden rounded-xl border bg-white p-5 shadow-sm space-y-4">
+            <h2 class="font-bold text-lg">Tambah Penyaluran Bantuan</h2>
+            <form id="penyaluran-tambah-form" class="grid gap-3 md:grid-cols-2">
+                <label class="text-sm">Penerima disetujui<select id="tambah-penerima" required class="mt-1 w-full rounded-lg border p-2"></select></label>
+                <label class="text-sm">Jenis bantuan<select id="tambah-bantuan" required class="mt-1 w-full rounded-lg border p-2"></select></label>
+                <label class="text-sm">Periode<select id="tambah-periode" required class="mt-1 w-full rounded-lg border p-2"></select></label>
+                <label class="text-sm">Catatan (opsional)<input id="tambah-catatan" maxlength="1000" class="mt-1 w-full rounded-lg border p-2"></label>
+                <div class="md:col-span-2 flex gap-2"><button class="rounded-lg bg-blue-700 px-4 py-2 text-white">Simpan Penyaluran</button><button type="button" id="tambah-batal" class="rounded-lg border px-4 py-2">Batal</button></div>
+            </form>
+            <p id="tambah-pesan" class="text-sm" role="status"></p>
+        </div>
         <section id="list-section" class="space-y-4">
             <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
                 <div class="grid gap-3 border-b border-slate-100 p-4 md:grid-cols-[1fr_220px_auto] md:items-end">
@@ -515,4 +528,26 @@
             }
         })();
     </script>
+<script>
+(() => {
+ const panel=document.getElementById('penyaluran-tambah-panel'), btn=document.getElementById('tambah-buka');
+ if(!btn)return;
+ const msg=document.getElementById('tambah-pesan');
+ const csrf=document.querySelector('meta[name="csrf-token"]')?.content || '';
+ const fill=(id,items,label)=>{const el=document.getElementById(id);el.replaceChildren(new Option('-- Pilih --',''));items.forEach(x=>el.add(new Option(label(x),x.id)));};
+ btn.addEventListener('click',async()=>{
+  panel.classList.remove('hidden');msg.textContent='Memuat pilihan...';
+  try{const r=await fetch('/api/penyaluran/pilihan',{headers:{'Accept':'application/json'}});if(!r.ok)throw Error('Gagal memuat pilihan');const d=await r.json();
+   fill('tambah-penerima',d.penerima,x=>x.nama_lengkap+' ('+x.nik+')');fill('tambah-bantuan',d.bantuan,x=>x.nama_bantuan);fill('tambah-periode',d.periode,x=>x.nama_periode);msg.textContent='';
+  }catch(e){msg.textContent=e.message;}
+ });
+ document.getElementById('tambah-batal').addEventListener('click',()=>panel.classList.add('hidden'));
+ document.getElementById('penyaluran-tambah-form').addEventListener('submit',async e=>{
+  e.preventDefault();msg.textContent='Menyimpan...';
+  const body={id_penerima:document.getElementById('tambah-penerima').value,id_bantuan:document.getElementById('tambah-bantuan').value,id_periode:document.getElementById('tambah-periode').value,catatan:document.getElementById('tambah-catatan').value};
+  try{const r=await fetch('/api/penyaluran',{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json','X-CSRF-TOKEN':csrf},body:JSON.stringify(body)});const d=await r.json();if(!r.ok)throw Error(d.message || Object.values(d.errors||{}).flat().join(', ') || 'Gagal menyimpan');location.href='/dashboard/penyaluran';}
+  catch(err){msg.textContent=err.message;}
+ });
+})();
+</script>
 </x-dashboard-layout>

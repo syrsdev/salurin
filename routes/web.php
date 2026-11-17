@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\PenerimaPersetujuanController;
 use App\Http\Controllers\Api\PenyaluranController;
+use App\Http\Controllers\Api\PeriodeController;
+use App\Http\Controllers\Api\PenyaluranTambahController;
 use App\Http\Controllers\CekStatusBantuanController;
 use App\Http\Controllers\Dashboard\PengaduanController as DashboardPengaduanController;
 use App\Http\Controllers\JenisBantuanController;
@@ -37,6 +39,8 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], fu
         Route::get('/penyaluran', function () {
             return view('pages.penyaluran.index');
         })->name('penyaluran.page');
+
+        Route::get('/periode', function () { return view('pages.periode.index'); })->name('periode.page');
 
         Route::get('/penyaluran/{id}', function (int $id) {
             return view('pages.penyaluran.index', ['penyaluranId' => $id]);
@@ -78,9 +82,18 @@ Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
         Route::patch('/{id}/tolak', [PenerimaPersetujuanController::class, 'tolak'])->name('tolak');
     });
 
+    Route::middleware('role:petugas')->group(function () {
+        Route::get('periode', [PeriodeController::class, 'index'])->name('periode.index');
+        Route::post('periode', [PeriodeController::class, 'store'])->name('periode.store');
+        Route::put('periode/{periode}', [PeriodeController::class, 'update'])->name('periode.update');
+        Route::delete('periode/{periode}', [PeriodeController::class, 'destroy'])->name('periode.destroy');
+    });
+
     // Petugas Desa: daftar penyaluran + ubah status
     Route::middleware('role:petugas')->prefix('penyaluran')->name('penyaluran.')->group(function () {
         Route::get('/', [PenyaluranController::class, 'index'])->name('index');
+        Route::get('/pilihan', [PenyaluranTambahController::class, 'pilihan'])->name('pilihan');
+        Route::post('/', [PenyaluranTambahController::class, 'store'])->name('store');
         Route::get('/{id}/riwayat', [PenyaluranController::class, 'riwayat'])->name('riwayat');
         Route::get('/{id}', [PenyaluranController::class, 'show'])->name('show');
         Route::patch('/{id}/status', [PenyaluranController::class, 'ubahStatus'])->name('status');
