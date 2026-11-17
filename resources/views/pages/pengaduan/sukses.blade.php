@@ -19,12 +19,21 @@
 
             <div class="mt-6 rounded-lg border border-dashed border-blue-300 bg-blue-50 p-5">
                 <p class="text-xs font-medium uppercase tracking-wide text-blue-700">Kode Tiket</p>
-                <p id="kode" class="mt-1 text-3xl font-bold tracking-wider text-blue-900">{{ $pengaduan->kode_tiket }}</p>
-                <button type="button" id="salin" class="mt-3 text-sm font-semibold text-blue-700 hover:underline"
-                        onclick="navigator.clipboard.writeText(document.getElementById('kode').innerText); this.innerText='Tersalin ✓'">
-                    Salin kode
+                <div class="mt-1 flex items-center justify-center gap-2">
+                    <p id="kode" class="text-3xl font-bold tracking-wider text-blue-900">{{ $pengaduan->kode_tiket }}</p>
+                    <button type="button" id="btn-salin" title="Salin kode" aria-label="Salin kode tiket"
+                        class="inline-flex h-8 w-8 items-center justify-center rounded-md text-blue-700 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                    <svg id="ikon-salin" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <rect x="9" y="9" width="11" height="11" rx="2" />
+                        <path stroke-linecap="round" d="M5 15V6a2 2 0 0 1 2-2h9" />
+                    </svg>
+                    <svg id="ikon-centang" class="hidden h-4 w-4 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 5 5L20 7" />
+                    </svg>
                 </button>
             </div>
+            <p id="pesan-salin" class="mt-1 hidden text-xs font-medium text-green-700" role="status">Kode tersalin</p>
+        </div>
 
             <p class="mt-4 text-xs text-slate-500">Status saat ini: <strong>{{ \App\Models\Pengaduan::STATUS[$pengaduan->status_pengaduan] ?? $pengaduan->status_pengaduan }}</strong></p>
 
@@ -34,5 +43,34 @@
             </div>
         </div>
     </main>
+
+    <script>
+    document.getElementById('btn-salin').addEventListener('click', async function () {
+        const kode = document.getElementById('kode').innerText.trim();
+
+        try {
+            await navigator.clipboard.writeText(kode);
+        } catch (e) {
+            // cadangan kalau clipboard API tidak tersedia
+            const t = document.createElement('textarea');
+            t.value = kode;
+            document.body.appendChild(t);
+            t.select();
+            document.execCommand('copy');
+            document.body.removeChild(t);
+        }
+
+        document.getElementById('ikon-salin').classList.add('hidden');
+        document.getElementById('ikon-centang').classList.remove('hidden');
+        document.getElementById('pesan-salin').classList.remove('hidden');
+
+        setTimeout(() => {
+            document.getElementById('ikon-salin').classList.remove('hidden');
+            document.getElementById('ikon-centang').classList.add('hidden');
+            document.getElementById('pesan-salin').classList.add('hidden');
+        }, 2000);
+    });
+</script>
+
 </body>
 </html>
