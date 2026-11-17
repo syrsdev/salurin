@@ -17,7 +17,7 @@
         <div class="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-3">
             <p class="text-[9px] font-semibold uppercase tracking-wider text-blue-200">Wilayah operasional</p>
             <p class="mt-1.5 text-xs font-semibold text-white">
-                {{ $wilayahOperasional ? 'Desa/Kelurahan '.$wilayahOperasional->kelurahan_desa : 'Wilayah belum diatur' }}
+                {{ $wilayahOperasional ? 'Desa/Kelurahan ' . $wilayahOperasional->kelurahan_desa : 'Wilayah belum diatur' }}
             </p>
             @if ($wilayahOperasional)
                 <p class="mt-1 text-[10px] text-blue-200">Kecamatan {{ $wilayahOperasional->kecamatan }}</p>
@@ -45,11 +45,14 @@
                 <span>Dashboard</span>
             </a>
             @if (auth()->user()->role == 'kepala_desa')
-                <a href="{{ route('persetujuan-penerima.page') }}" x-on:click="sidebarOpen = false" @class([
-                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition',
-                    'bg-blue-800 text-white shadow-sm' => request()->routeIs('persetujuan-penerima.page'),
-                    'text-blue-100 hover:bg-white/10 hover:text-white' => !request()->routeIs('persetujuan-penerima.page'),
-                ]) @if (request()->routeIs('persetujuan-penerima.page')) aria-current="page" @endif>
+                <a href="{{ route('persetujuan-penerima.page') }}" x-on:click="sidebarOpen = false"
+                    @class([
+                        'flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition',
+                        'bg-blue-800 text-white shadow-sm' => request()->routeIs(
+                            'persetujuan-penerima.page'),
+                        'text-blue-100 hover:bg-white/10 hover:text-white' => !request()->routeIs(
+                            'persetujuan-penerima.page'),
+                    ]) @if (request()->routeIs('persetujuan-penerima.page')) aria-current="page" @endif>
                     <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="1.8" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -92,11 +95,32 @@
                     <span>Jenis Bantuan</span>
                 </a>
 
+
+                <a href="{{ route('periode.page') }}" x-on:click="sidebarOpen = false" @class([
+                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition',
+                    'bg-blue-800 text-white shadow-sm' => request()->routeIs('periode.*'),
+                    'text-blue-100 hover:bg-white/10 hover:text-white' => !request()->routeIs(
+                        'periode.*'),
+                ])
+                    @if (request()->routeIs('periode.*')) aria-current="page" @endif>
+
+                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.8" aria-hidden="true">
+                        <rect x="3" y="5" width="18" height="16" rx="2" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 3v4M17 3v4M3 10h18M8 14h3M8 17h3" />
+                    </svg>
+
+                    <span>Kelola Periode</span>
+                </a>
+
+
                 <a href="{{ route('penyaluran.page') }}" x-on:click="sidebarOpen = false" @class([
                     'flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition',
                     'bg-blue-800 text-white shadow-sm' => request()->routeIs('penyaluran.*'),
-                    'text-blue-100 hover:bg-white/10 hover:text-white' => !request()->routeIs('penyaluran.*'),
-                ]) @if (request()->routeIs('penyaluran.*')) aria-current="page" @endif>
+                    'text-blue-100 hover:bg-white/10 hover:text-white' => !request()->routeIs(
+                        'penyaluran.*'),
+                ])
+                    @if (request()->routeIs('penyaluran.*')) aria-current="page" @endif>
                     <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="1.8" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -105,18 +129,22 @@
                     <span>Penyaluran Bantuan</span>
                 </a>
 
-                <a href="{{ route('dashboard.pengaduan.index') }}" x-on:click="sidebarOpen = false" @class([
-                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition',
-                    'bg-blue-800 text-white shadow-sm' => request()->routeIs('dashboard.pengaduan.*'),
-                    'text-blue-100 hover:bg-white/10 hover:text-white' => !request()->routeIs('dashboard.pengaduan.*'),
-                ]) @if (request()->routeIs('dashboard.pengaduan.*')) aria-current="page" @endif>
+                <a href="{{ route('dashboard.pengaduan.index') }}" x-on:click="sidebarOpen = false"
+                    @class([
+                        'flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition',
+                        'bg-blue-800 text-white shadow-sm' => request()->routeIs(
+                            'dashboard.pengaduan.*'),
+                        'text-blue-100 hover:bg-white/10 hover:text-white' => !request()->routeIs(
+                            'dashboard.pengaduan.*'),
+                    ]) @if (request()->routeIs('dashboard.pengaduan.*')) aria-current="page" @endif>
                     <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="1.8" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 5h16v12H8l-4 3V5Z" />
                     </svg>
                     <span class="flex-1">Pengaduan Masuk</span>
                     @if ($pengaduanBaru > 0)
-                        <span class="rounded bg-blue-800 px-1.5 py-0.5 text-[9px] font-semibold text-blue-100">{{ $pengaduanBaru }}</span>
+                        <span
+                            class="rounded bg-blue-800 px-1.5 py-0.5 text-[9px] font-semibold text-blue-100">{{ $pengaduanBaru }}</span>
                     @endif
                 </a>
             @endif
@@ -132,10 +160,11 @@
             </span>
             <span class="flex-1 min-w-0">
                 <span class="block truncate text-[11px] font-semibold text-white">{{ Auth::user()->name }}</span>
-                <span class="mt-0.5 block truncate text-[9px] text-blue-200">{{ auth()->user()->role === 'kepala_desa' ? 'Kepala Desa' : (auth()->user()->role === 'admin' ? 'Administrator' : 'Petugas Desa/Kelurahan') }}</span>
+                <span
+                    class="mt-0.5 block truncate text-[9px] text-blue-200">{{ auth()->user()->role === 'kepala_desa' ? 'Kepala Desa' : (auth()->user()->role === 'admin' ? 'Administrator' : 'Petugas Desa/Kelurahan') }}</span>
             </span>
-            <a href="{{ route('profile.edit') }}" class="p-1 text-blue-200 rounded hover:bg-white/10 hover:text-white"
-                aria-label="Buka profil">
+            <a href="{{ route('profile.edit') }}"
+                class="p-1 text-blue-200 rounded hover:bg-white/10 hover:text-white" aria-label="Buka profil">
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
                     aria-hidden="true">
                     <circle cx="12" cy="12" r="3" />

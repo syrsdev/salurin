@@ -8,6 +8,8 @@ class Periode extends Model
 {
     protected $table = 'periode';
 
+    protected $fillable = ['nama_periode', 'tgl_mulai', 'tgl_selesai'];
+
     protected function casts(): array
     {
         return [
