@@ -46,10 +46,9 @@ class Penerima extends Model
         return $this->hasMany(Penyaluran::class, 'id_penerima');
     }
 
-    public function scopeMatchingIdentity(Builder $query, string $nik, string $noKk, string $tanggalLahir): void
+    public function scopeMatchingIdentity(Builder $query, string $nik, string $tanggalLahir): void
     {
         $query->where('nik', $nik)
-            ->where('no_kk', $noKk)
             ->whereDate('tanggal_lahir', $tanggalLahir);
     }
 }

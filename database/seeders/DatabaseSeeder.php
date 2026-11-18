@@ -19,11 +19,19 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
         Wilayah::create([
             'provinsi' => 'Jawa Barat',
-            'kabupaten_kota' => 'Kabupaten Contoh',
-            'kecamatan' => 'Kecamatan Contoh',
+            'kabupaten_kota' => 'Sumedang',
+            'kecamatan' => 'Sukabiru',
             'kelurahan_desa' => 'Sukamaju',
             'rw' => '01',
             'rt' => '01'
+        ]);
+        Wilayah::create([
+            'provinsi' => 'Jawa Timur',
+            'kabupaten_kota' => 'Gresik',
+            'kecamatan' => 'Benjeng',
+            'kelurahan_desa' => 'Karangturi',
+            'rw' => '01',
+            'rt' => '04'
         ]);
 
         User::create([
@@ -33,6 +41,13 @@ class DatabaseSeeder extends Seeder
             'role' => 'petugas',
             'id_wilayah' => 1
         ]);
+        User::create([
+            'name' => 'Petugas',
+            'email' => 'petugas2@gmail.com',
+            'password' => bcrypt('password'),
+            'role' => 'petugas',
+            'id_wilayah' => 2
+        ]);
 
         User::create([
             'name' => 'Kepala Desa',
@@ -40,6 +55,13 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password'),
             'role' => 'kepala_desa',
             'id_wilayah' => 1
+        ]);
+        User::create([
+            'name' => 'Kepala Desa 2',
+            'email' => 'kades2@gmail.com',
+            'password' => bcrypt('password'),
+            'role' => 'kepala_desa',
+            'id_wilayah' => 2
         ]);
     }
 }
