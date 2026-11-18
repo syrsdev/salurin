@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Penyaluran extends Model
 {
@@ -20,10 +21,10 @@ class Penyaluran extends Model
     ];
 
     public const STATUS = [
-        'terdaftar'    => 'Terdaftar',
+        'terdaftar' => 'Terdaftar',
         'diverifikasi' => 'Diverifikasi',
-        'dijadwalkan'  => 'Dijadwalkan',
-        'cair'         => 'Cair',
+        'dijadwalkan' => 'Dijadwalkan',
+        'cair' => 'Cair',
     ];
 
     protected function casts(): array
@@ -46,5 +47,21 @@ class Penyaluran extends Model
     public function periode(): BelongsTo
     {
         return $this->belongsTo(Periode::class, 'id_periode');
+    }
+
+    public function buktiPenyalurans(): HasMany
+    {
+        return $this->hasMany(BuktiPenyaluran::class, 'id_penyaluran');
+    }
+
+    public function canTransitionTo(string $status): bool
+    {
+        $statuses = array_keys(self::STATUS);
+        $currentPosition = array_search($this->status_penyaluran, $statuses, true);
+        $nextPosition = array_search($status, $statuses, true);
+
+        return $currentPosition !== false
+            && $nextPosition !== false
+            && $nextPosition >= $currentPosition;
     }
 }

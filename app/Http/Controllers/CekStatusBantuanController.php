@@ -55,6 +55,7 @@ class CekStatusBantuanController extends Controller
                         ->with([
                             'jenisBantuan:id,nama_bantuan,nominal',
                             'periode:id,nama_periode,tgl_mulai,tgl_selesai',
+                            'buktiPenyalurans:id,id_penyaluran,path_file,tgl_unggah',
                         ])
                         ->orderByDesc('id');
                 },

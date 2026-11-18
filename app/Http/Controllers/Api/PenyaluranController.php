@@ -9,7 +9,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+use Throwable;
 
 /**
  * Petugas Desa: lihat daftar penyaluran dan ubah status tiap penerima.
@@ -40,8 +43,8 @@ class PenyaluranController extends Controller
 
                 if ($search !== '') {
                     $q->where(function ($w) use ($search) {
-                        $w->where('nama_lengkap', 'like', '%' . $search . '%')
-                            ->orWhere('nik', 'like', '%' . $search . '%');
+                        $w->where('nama_lengkap', 'like', '%'.$search.'%')
+                            ->orWhere('nik', 'like', '%'.$search.'%');
                     });
                 }
             });
@@ -62,6 +65,7 @@ class PenyaluranController extends Controller
                 'penerima:id,nik,nama_lengkap,status_data,alamat',
                 'jenisBantuan:id,nama_bantuan,nominal,deskripsi',
                 'periode:id,nama_periode,tgl_mulai,tgl_selesai',
+                'buktiPenyalurans:id,id_penyaluran,path_file,tgl_unggah',
             ])
             ->where('id', $id)
             ->firstOrFail();
@@ -110,35 +114,83 @@ class PenyaluranController extends Controller
 
         $data = $request->validate([
             'status_penyaluran' => ['required', Rule::in(array_keys(Penyaluran::STATUS))],
-            'tgl_penyaluran'    => ['nullable', 'date'],
-            'catatan'           => ['nullable', 'string', 'max:1000'],
+            'tgl_penyaluran' => ['nullable', 'date'],
+            'catatan' => ['nullable', 'string', 'max:1000'],
+            'bukti_foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ], [
             'status_penyaluran.required' => 'Status penyaluran wajib dipilih.',
-            'status_penyaluran.in'       => 'Status penyaluran tidak valid.',
+            'status_penyaluran.in' => 'Status penyaluran tidak valid.',
+            'bukti_foto.image' => 'Bukti penyaluran harus berupa gambar.',
+            'bukti_foto.mimes' => 'Bukti penyaluran harus berformat JPG, PNG, atau WebP.',
+            'bukti_foto.max' => 'Ukuran bukti penyaluran maksimal 5 MB.',
         ]);
 
-        $penyaluran = DB::transaction(function () use ($id, $wilayahId, $data) {
-            $penyaluran = $this->querySewilayah($wilayahId)
-                ->where('id', $id)
-                ->lockForUpdate()
-                ->firstOrFail();
+        if ($request->hasFile('bukti_foto') && $data['status_penyaluran'] !== 'cair') {
+            throw ValidationException::withMessages([
+                'bukti_foto' => 'Bukti foto hanya dapat diunggah saat status diubah menjadi Cair.',
+            ]);
+        }
 
-            $lama = $penyaluran->only(self::KOLOM_AUDIT);
+        $storedPath = null;
 
-            $penyaluran->update(
-                Arr::only($data, ['status_penyaluran', 'tgl_penyaluran', 'catatan'])
-            );
+        try {
+            $penyaluran = DB::transaction(function () use ($request, $id, $wilayahId, $data, &$storedPath) {
+                $penyaluran = $this->querySewilayah($wilayahId)
+                    ->where('id', $id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
 
-            AuditTrail::catat(
-                'penyaluran',
-                $penyaluran->id,
-                'update',
-                $lama,
-                $penyaluran->only(self::KOLOM_AUDIT)
-            );
+                if (! $penyaluran->canTransitionTo($data['status_penyaluran'])) {
+                    throw ValidationException::withMessages([
+                        'status_penyaluran' => 'Status penyaluran tidak dapat diubah ke tahap sebelumnya.',
+                    ]);
+                }
 
-            return $penyaluran;
-        });
+                if ($data['status_penyaluran'] === 'cair'
+                    && $penyaluran->status_penyaluran !== 'cair'
+                    && ! $request->hasFile('bukti_foto')) {
+                    throw ValidationException::withMessages([
+                        'bukti_foto' => 'Bukti foto wajib diunggah saat status diubah menjadi Cair.',
+                    ]);
+                }
+
+                $lama = $penyaluran->only(self::KOLOM_AUDIT);
+
+                if ($request->hasFile('bukti_foto')) {
+                    $path = $request->file('bukti_foto')->store('bukti-penyaluran', 'public');
+
+                    if ($path === false) {
+                        throw new \RuntimeException('Bukti penyaluran gagal disimpan.');
+                    }
+
+                    $storedPath = $path;
+
+                    $penyaluran->buktiPenyalurans()->create([
+                        'path_file' => $storedPath,
+                    ]);
+                }
+
+                $penyaluran->update(
+                    Arr::only($data, ['status_penyaluran', 'tgl_penyaluran', 'catatan'])
+                );
+
+                AuditTrail::catat(
+                    'penyaluran',
+                    $penyaluran->id,
+                    'update',
+                    $lama,
+                    $penyaluran->only(self::KOLOM_AUDIT)
+                );
+
+                return $penyaluran;
+            });
+        } catch (Throwable $exception) {
+            if ($storedPath !== null && ! Storage::disk('public')->delete($storedPath)) {
+                report(new \RuntimeException('Bukti penyaluran gagal dibersihkan setelah transaksi dibatalkan.'));
+            }
+
+            throw $exception;
+        }
 
         return response()->json([
             'message' => 'Status penyaluran diperbarui.',
@@ -146,6 +198,7 @@ class PenyaluranController extends Controller
                 'penerima:id,nik,nama_lengkap,status_data,alamat',
                 'jenisBantuan:id,nama_bantuan,nominal,deskripsi',
                 'periode:id,nama_periode,tgl_mulai,tgl_selesai',
+                'buktiPenyalurans:id,id_penyaluran,path_file,tgl_unggah',
             ]),
         ]);
     }

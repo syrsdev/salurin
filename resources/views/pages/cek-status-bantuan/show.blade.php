@@ -243,6 +243,23 @@
 
                         </div>
 
+                        @if ($penyaluran->status_penyaluran === 'cair')
+                            <div class="pt-5 mt-5 border-t border-slate-100">
+                                <h4 class="font-semibold text-slate-800">Bukti Foto Pencairan</h4>
+
+                                @forelse ($penyaluran->buktiPenyalurans as $bukti)
+                                    <a href="{{ $bukti->url }}" target="_blank" rel="noopener noreferrer"
+                                        class="mt-3 inline-flex">
+                                        <img src="{{ $bukti->url }}" alt="Bukti foto penyaluran bantuan"
+                                            loading="lazy"
+                                            class="max-h-96 rounded-lg border border-slate-200 object-contain">
+                                    </a>
+                                @empty
+                                    <p class="mt-2 text-sm text-slate-500">Bukti foto belum tersedia.</p>
+                                @endforelse
+                            </div>
+                        @endif
+
                     </article>
 
                 @empty
