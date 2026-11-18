@@ -1,4 +1,4 @@
-<header class="border-b border-slate-200 bg-white">
+<header class="sticky top-0 z-30 border-b border-slate-200 bg-white">
     <div
         class="mx-auto flex max-w-[1600px] flex-col justify-between gap-3 px-4 py-3 sm:flex-row sm:items-center sm:px-6 lg:px-8">
         <a href="{{ route('transparansi') }}" class="flex items-center gap-3 text-blue-900 no-underline">
@@ -27,6 +27,10 @@
                 @if (request()->routeIs('pengaduan.*')) aria-current="page" @endif
                 class="rounded-lg px-3 py-2 {{ request()->routeIs('pengaduan.*') ? 'bg-blue-50 text-blue-900' : 'text-slate-600 hover:bg-slate-100' }}">
                 Pengaduan
+            </a>
+            <a href="{{ route('login') }}"
+                class="rounded-lg bg-blue-900 px-4 py-2 text-white transition hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">
+                Login Admin
             </a>
             <span class="hidden border-l border-slate-200 pl-4 text-xs text-slate-500 md:inline">Layanan
                 publik</span>

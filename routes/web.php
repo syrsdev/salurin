@@ -13,14 +13,14 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicDashboardController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
 Route::get('/pengaduan', [PengaduanController::class, 'create'])->name('pengaduan.create');
 Route::post('/pengaduan', [PengaduanController::class, 'store'])->middleware('throttle:10,1')->name('pengaduan.store');
 Route::get('/pengaduan/cari', [PengaduanController::class, 'cari'])->middleware('throttle:30,1')->name('pengaduan.cari');
-Route::get('/transparansi', [PublicDashboardController::class, 'index'])->name('transparansi');
+Route::get('/', [PublicDashboardController::class, 'index'])->name('transparansi');
 Route::get('/cek-status-bantuan', [CekStatusBantuanController::class, 'index'])->name('cek-status-bantuan.index');
 Route::post('/cek-status-bantuan/cari', [CekStatusBantuanController::class, 'cari'])
     ->middleware('throttle:10,1')
