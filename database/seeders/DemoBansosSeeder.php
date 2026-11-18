@@ -22,13 +22,13 @@ class DemoBansosSeeder extends Seeder
         DB::table('wilayah')->updateOrInsert(
             ['kelurahan_desa' => 'Sukamaju'],
             [
-                'provinsi'       => 'Jawa Barat',
+                'provinsi' => 'Jawa Barat',
                 'kabupaten_kota' => 'Kabupaten Contoh',
-                'kecamatan'      => 'Kecamatan Contoh',
-                'rw'             => '01',
-                'rt'             => '01',
-                'created_at'     => $now,
-                'updated_at'     => $now,
+                'kecamatan' => 'Kecamatan Contoh',
+                'rw' => '01',
+                'rt' => '01',
+                'created_at' => $now,
+                'updated_at' => $now,
             ]
         );
         $wilayahId = DB::table('wilayah')->where('kelurahan_desa', 'Sukamaju')->value('id');
@@ -43,9 +43,9 @@ class DemoBansosSeeder extends Seeder
             DB::table('users')->updateOrInsert(
                 ['email' => $a['email']],
                 [
-                    'name'       => $a['name'],
-                    'password'   => Hash::make('password123'),
-                    'role'       => $a['role'],
+                    'name' => $a['name'],
+                    'password' => Hash::make('password123'),
+                    'role' => $a['role'],
                     'id_wilayah' => $wilayahId,
                     'created_at' => $now,
                     'updated_at' => $now,
@@ -53,28 +53,52 @@ class DemoBansosSeeder extends Seeder
             );
         }
 
-        $kadesId    = DB::table('users')->where('email', 'kades@sukamaju.test')->value('id');
-        $petugasId  = DB::table('users')->where('email', 'petugas@sukamaju.test')->value('id');
+        $kadesId = DB::table('users')->where('email', 'kades@sukamaju.test')->value('id');
+        $petugasId = DB::table('users')->where('email', 'petugas@sukamaju.test')->value('id');
 
         // 3. Jenis bantuan & periode
-        DB::table('jenis_bantuan')->updateOrInsert(
-            ['nama_bantuan' => 'Bantuan Langsung Tunai Desa'],
+        $jenisBantuan = [
             [
-                'nominal'    => 300000,
-                'deskripsi'  => 'Bantuan tunai untuk keluarga kurang mampu (data uji).',
-                'created_at' => $now,
-                'updated_at' => $now,
-            ]
-        );
-        $bantuanId = DB::table('jenis_bantuan')->where('nama_bantuan', 'Bantuan Langsung Tunai Desa')->value('id');
+                'nama_bantuan' => 'Bantuan Langsung Tunai Desa',
+                'nominal' => 300000,
+                'deskripsi' => 'Bantuan tunai untuk keluarga kurang mampu (data uji).',
+            ],
+            [
+                'nama_bantuan' => 'Bantuan Pangan Desa',
+                'nominal' => 200000,
+                'deskripsi' => 'Bantuan pangan bagi keluarga penerima manfaat (data uji).',
+            ],
+            [
+                'nama_bantuan' => 'Bantuan Pendidikan Desa',
+                'nominal' => 250000,
+                'deskripsi' => 'Bantuan perlengkapan pendidikan untuk anak sekolah (data uji).',
+            ],
+        ];
+        $jenisBantuanIds = [];
+
+        foreach ($jenisBantuan as $bantuan) {
+            DB::table('jenis_bantuan')->updateOrInsert(
+                ['nama_bantuan' => $bantuan['nama_bantuan']],
+                [
+                    'nominal' => $bantuan['nominal'],
+                    'deskripsi' => $bantuan['deskripsi'],
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]
+            );
+
+            $jenisBantuanIds[] = DB::table('jenis_bantuan')
+                ->where('nama_bantuan', $bantuan['nama_bantuan'])
+                ->value('id');
+        }
 
         DB::table('periode')->updateOrInsert(
             ['nama_periode' => 'Periode November 2026'],
             [
-                'tgl_mulai'   => '2026-11-01',
+                'tgl_mulai' => '2026-11-01',
                 'tgl_selesai' => '2026-11-30',
-                'created_at'  => $now,
-                'updated_at'  => $now,
+                'created_at' => $now,
+                'updated_at' => $now,
             ]
         );
         $periodeId = DB::table('periode')->where('nama_periode', 'Periode November 2026')->value('id');
@@ -95,14 +119,14 @@ class DemoBansosSeeder extends Seeder
             DB::table('penerima')->updateOrInsert(
                 ['nik' => $nik],
                 [
-                    'no_kk'          => '3200000000009' . str_pad((string) ($i + 1), 3, '0', STR_PAD_LEFT),
-                    'nama_lengkap'   => $nama,
-                    'alamat'         => $alamat,
-                    'tanggal_lahir'  => $lahir,
-                    'status_data'    => $statusData,
-                    'tgl_disetujui'  => $disetujui ? $now : null,
-                    'id_wilayah'     => $wilayahId,
-                    'dibuat_oleh'    => $petugasId,
+                    'no_kk' => '3200000000009'.str_pad((string) ($i + 1), 3, '0', STR_PAD_LEFT),
+                    'nama_lengkap' => $nama,
+                    'alamat' => $alamat,
+                    'tanggal_lahir' => $lahir,
+                    'status_data' => $statusData,
+                    'tgl_disetujui' => $disetujui ? $now : null,
+                    'id_wilayah' => $wilayahId,
+                    'dibuat_oleh' => $petugasId,
                     'disetujui_oleh' => $disetujui ? $kadesId : null,
                 ]
             );
@@ -113,11 +137,11 @@ class DemoBansosSeeder extends Seeder
             DB::table('penyaluran')->updateOrInsert(
                 ['id_penerima' => $penerimaId, 'id_periode' => $periodeId],
                 [
-                    'id_bantuan'        => $bantuanId,
-                    'id_pengguna'       => $petugasId,
+                    'id_bantuan' => $jenisBantuanIds[$i % count($jenisBantuanIds)],
+                    'id_pengguna' => $petugasId,
                     'status_penyaluran' => $statusSalur,
-                    'created_at'        => $now,
-                    'updated_at'        => $now,
+                    'created_at' => $now,
+                    'updated_at' => $now,
                 ]
             );
         }
