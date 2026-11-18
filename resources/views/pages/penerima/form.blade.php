@@ -126,7 +126,9 @@
             <select id="id_wilayah" name="id_wilayah" required
                 class="w-full px-4 py-3 text-sm bg-white border rounded-lg border-slate-300 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">
 
-                <option value="">Pilih wilayah</option>
+                @if ($wilayahOptions->count() !== 1)
+                    <option value="">Pilih wilayah</option>
+                @endif
 
                 @foreach ($wilayahOptions as $wilayah)
                     <option value="{{ $wilayah->id }}" @selected((string) old('id_wilayah', $penerima->id_wilayah ?? '') === (string) $wilayah->id)>
