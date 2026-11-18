@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AuditTrail;
 use App\Models\Penerima;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -112,10 +113,14 @@ class PenerimaController extends Controller
         $user = $this->authorizePetugas();
         $data = $this->validatedData($request, $user);
 
-        Penerima::create(array_merge($data, [
-            'id_wilayah' => $user->id_wilayah,
-            'dibuat_oleh' => $user->id,
-        ]));
+        DB::transaction(function () use ($data, $user): void {
+            $penerima = Penerima::create(array_merge($data, [
+                'id_wilayah' => $user->id_wilayah,
+                'dibuat_oleh' => $user->id,
+            ]));
+
+            AuditTrail::catat('penerima', $penerima->id, 'create', null, $penerima->only(['status_data']));
+        });
 
         return redirect()->route('penerima.index')->with('success', 'Data penerima berhasil ditambahkan.');
     }
@@ -139,9 +144,20 @@ class PenerimaController extends Controller
         $this->authorizePenerimaAccess($penerima, $user);
         $data = $this->validatedData($request, $user, $penerima);
 
-        $penerima->update(array_merge($data, [
-            'id_wilayah' => $user->id_wilayah,
-        ]));
+        DB::transaction(function () use ($data, $penerima, $user): void {
+            $oldData = $penerima->only(['status_data']);
+            $penerima->update(array_merge($data, [
+                'id_wilayah' => $user->id_wilayah,
+            ]));
+
+            AuditTrail::catat(
+                'penerima',
+                $penerima->id,
+                'update',
+                $oldData,
+                $penerima->only(['status_data'])
+            );
+        });
 
         return redirect()->route('penerima.index')->with('success', 'Data penerima berhasil diperbarui.');
     }

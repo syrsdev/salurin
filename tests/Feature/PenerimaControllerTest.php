@@ -91,6 +91,11 @@ describe('recipient CRUD', function () {
             'dibuat_oleh' => $petugas->id,
             'status_data' => 'menunggu',
         ]);
+        $this->assertDatabaseHas('audit_trail', [
+            'id_pengguna' => $petugas->id,
+            'nama_tabel' => 'penerima',
+            'aksi' => 'create',
+        ]);
     });
 
     it('rejects a duplicate NIK when storing a recipient', function () {
@@ -169,6 +174,12 @@ describe('recipient CRUD', function () {
             'nama_lengkap' => 'Nama Diperbarui',
             'status_data' => 'disetujui',
             'dibuat_oleh' => $petugas->id,
+        ]);
+        $this->assertDatabaseHas('audit_trail', [
+            'id_pengguna' => $petugas->id,
+            'nama_tabel' => 'penerima',
+            'id_record' => $penerima->id,
+            'aksi' => 'update',
         ]);
     });
 

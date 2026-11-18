@@ -4,6 +4,7 @@
     $statusClasses = [
         'Menunggu' => 'bg-amber-50 text-amber-700 before:bg-amber-600',
         'Selesai' => 'bg-emerald-50 text-emerald-700 before:bg-emerald-600',
+        'Cair' => 'bg-emerald-50 text-emerald-700 before:bg-emerald-600',
         'Disetujui' => 'bg-emerald-50 text-emerald-700 before:bg-emerald-600',
         'Diproses' => 'bg-orange-50 text-orange-700 before:bg-orange-600',
         'Ditolak' => 'bg-red-50 text-red-700 before:bg-red-600',

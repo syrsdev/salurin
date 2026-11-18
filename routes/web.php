@@ -2,10 +2,11 @@
 
 use App\Http\Controllers\Api\PenerimaPersetujuanController;
 use App\Http\Controllers\Api\PenyaluranController;
-use App\Http\Controllers\Api\PeriodeController;
 use App\Http\Controllers\Api\PenyaluranTambahController;
+use App\Http\Controllers\Api\PeriodeController;
 use App\Http\Controllers\CekStatusBantuanController;
 use App\Http\Controllers\Dashboard\PengaduanController as DashboardPengaduanController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JenisBantuanController;
 use App\Http\Controllers\PenerimaController;
 use App\Http\Controllers\PengaduanController;
@@ -28,9 +29,7 @@ Route::post('/cek-status-bantuan/cari', [CekStatusBantuanController::class, 'car
 Route::get('/pengaduan/sukses/{kode}', [PengaduanController::class, 'sukses'])->name('pengaduan.sukses');
 
 Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], function () {
-    Route::get('/', function () {
-        return view('pages.dashboard');
-    })->name('dashboard');
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::middleware(['role:petugas'])->group(function () {
         Route::resource('penerima', PenerimaController::class)->except(['show']);
@@ -107,4 +106,4 @@ Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
     });
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
