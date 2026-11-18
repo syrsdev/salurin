@@ -100,7 +100,9 @@ class PenerimaController extends Controller
             ->orderBy('kelurahan_desa')
             ->get(['id', 'kelurahan_desa', 'kecamatan']);
 
-        $penerima = new Penerima;
+        $penerima = new Penerima([
+            'id_wilayah' => $user->id_wilayah,
+        ]);
 
         return view('pages.penerima.form', compact('penerima', 'wilayahOptions'));
     }

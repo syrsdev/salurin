@@ -44,13 +44,14 @@ function createPenerima(User $user, int $wilayahId, array $attributes = []): Pen
 
 describe('recipient CRUD', function () {
     it('shows the create form with its store endpoint', function () {
-        [$petugas] = createPetugasWithWilayah();
+        [$petugas, $wilayahId] = createPetugasWithWilayah();
 
         $response = $this->actingAs($petugas)->get(route('penerima.create'));
 
         $response->assertOk()
             ->assertSee('Tambah Data Penerima')
-            ->assertSee(route('penerima.store'));
+            ->assertSee(route('penerima.store'))
+            ->assertSee('value="'.$wilayahId.'" selected', false);
     });
 
     it('shows the edit form for a recipient in the assigned region', function () {

@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,16 +8,15 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased">
+<body class="min-h-screen font-sans antialiased bg-slate-50 text-slate-900">
 
     <x-public-navbar />
 
-    <main class="mx-auto max-w-4xl space-y-6 px-4 py-10">
+    <main class="max-w-4xl px-4 py-10 mx-auto space-y-6">
 
         {{-- Judul halaman --}}
         <div>
-            <a href="{{ route('cek-status-bantuan.index') }}"
-                class="text-sm font-medium text-blue-700 hover:underline">
+            <a href="{{ route('cek-status-bantuan.index') }}" class="text-sm font-medium text-blue-700 hover:underline">
                 ← Kembali ke halaman cek status
             </a>
 
@@ -33,14 +32,14 @@
         @if (!$penerima)
 
             {{-- Data tidak ditemukan --}}
-            <div class="rounded-xl border border-yellow-200 bg-yellow-50 p-6">
+            <div class="p-6 border border-yellow-200 rounded-xl bg-yellow-50">
                 <h2 class="font-bold text-yellow-900">
                     Data Penerima Tidak Ditemukan
                 </h2>
 
                 <p class="mt-2 text-sm leading-relaxed text-yellow-800">
                     Data yang Anda masukkan belum cocok dengan data penerima bantuan.
-                    Silakan periksa kembali NIK, Nomor KK, dan tanggal lahir Anda.
+                    Silakan periksa kembali NIK dan tanggal lahir Anda.
                 </p>
 
                 <a href="{{ route('cek-status-bantuan.index') }}"
@@ -48,14 +47,12 @@
                     Coba Lagi
                 </a>
             </div>
-
         @else
-
             {{-- Informasi penerima --}}
-            <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+            <section class="p-5 bg-white border shadow-sm rounded-xl border-slate-200 sm:p-6">
                 <h2 class="text-lg font-bold">Informasi Penerima</h2>
 
-                <div class="mt-5 grid gap-4 sm:grid-cols-2">
+                <div class="grid gap-4 mt-5 sm:grid-cols-2">
 
                     <div>
                         <p class="text-xs font-medium uppercase text-slate-500">
@@ -91,7 +88,8 @@
                             };
                         @endphp
 
-                        <span class="mt-2 inline-flex rounded-full px-3 py-1 text-xs font-semibold {{ $statusDataClass }}">
+                        <span
+                            class="mt-2 inline-flex rounded-full px-3 py-1 text-xs font-semibold {{ $statusDataClass }}">
                             {{ ucfirst($statusData) }}
                         </span>
                     </div>
@@ -118,7 +116,6 @@
                 </div>
 
                 @forelse ($penerima->penyalurans as $penyaluran)
-
                     @php
                         $tahapan = [
                             'terdaftar' => 'Terdaftar',
@@ -127,18 +124,14 @@
                             'cair' => 'Bantuan Dicairkan',
                         ];
 
-                        $urutanStatus = array_search(
-                            $penyaluran->status_penyaluran,
-                            array_keys($tahapan),
-                            true
-                        );
+                        $urutanStatus = array_search($penyaluran->status_penyaluran, array_keys($tahapan), true);
 
                         $urutanStatus = $urutanStatus === false ? -1 : $urutanStatus;
 
                         $statusDikenal = $urutanStatus >= 0;
                     @endphp
 
-                    <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                    <article class="p-5 bg-white border shadow-sm rounded-xl border-slate-200 sm:p-6">
 
                         <div class="flex flex-col justify-between gap-3 sm:flex-row">
                             <div>
@@ -164,13 +157,12 @@
                             </div>
                         </div>
 
-                        <div class="mt-6 border-t border-slate-100 pt-5">
+                        <div class="pt-5 mt-6 border-t border-slate-100">
                             <h4 class="mb-5 font-semibold text-slate-800">
                                 Timeline Penyaluran
                             </h4>
 
                             @if ($statusDikenal)
-
                                 <div class="relative space-y-6">
 
                                     @foreach ($tahapan as $kode => $nama)
@@ -183,14 +175,17 @@
                                         <div class="relative flex gap-4">
 
                                             @if (!$loop->last)
-                                                <div class="absolute left-[11px] top-7 h-full w-0.5 {{ $selesai ? 'bg-green-400' : 'bg-slate-200' }}"></div>
+                                                <div
+                                                    class="absolute left-[11px] top-7 h-full w-0.5 {{ $selesai ? 'bg-green-400' : 'bg-slate-200' }}">
+                                                </div>
                                             @endif
 
-                                            <div class="relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full
+                                            <div
+                                                class="relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full
                                                 {{ $selesai ? 'bg-green-600 text-white' : 'border-2 border-slate-300 bg-white text-slate-400' }}">
 
                                                 @if ($selesai)
-                                                    <svg class="h-4 w-4" fill="none" stroke="currentColor"
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24" aria-hidden="true">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             stroke-width="2.5" d="m5 12 4 4L19 6" />
@@ -202,12 +197,14 @@
                                             </div>
 
                                             <div class="pb-2">
-                                                <p class="font-semibold {{ $selesai ? 'text-slate-900' : 'text-slate-400' }}">
+                                                <p
+                                                    class="font-semibold {{ $selesai ? 'text-slate-900' : 'text-slate-400' }}">
                                                     {{ $nama }}
                                                 </p>
 
                                                 @if ($tahapAktif)
-                                                    <span class="mt-1 inline-flex rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">
+                                                    <span
+                                                        class="mt-1 inline-flex rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">
                                                         Status saat ini
                                                     </span>
                                                 @elseif (!$selesai)
@@ -221,7 +218,6 @@
                                     @endforeach
 
                                 </div>
-
                             @else
                                 <p class="text-sm text-slate-600">
                                     Status penyaluran belum tersedia atau sedang diperbarui.
@@ -229,7 +225,7 @@
                             @endif
                         </div>
 
-                        <div class="mt-5 grid gap-3 border-t border-slate-100 pt-5 sm:grid-cols-2">
+                        <div class="grid gap-3 pt-5 mt-5 border-t border-slate-100 sm:grid-cols-2">
 
                             <div>
                                 <p class="text-xs text-slate-500">Tanggal penyaluran</p>
@@ -240,18 +236,35 @@
 
                             <div>
                                 <p class="text-xs text-slate-500">Catatan</p>
-                                <p class="mt-1 whitespace-pre-line text-sm font-medium">
+                                <p class="mt-1 text-sm font-medium whitespace-pre-line">
                                     {{ $penyaluran->catatan ?: 'Tidak ada catatan.' }}
                                 </p>
                             </div>
 
                         </div>
 
+                        @if ($penyaluran->status_penyaluran === 'cair')
+                            <div class="pt-5 mt-5 border-t border-slate-100">
+                                <h4 class="font-semibold text-slate-800">Bukti Foto Pencairan</h4>
+
+                                @forelse ($penyaluran->buktiPenyalurans as $bukti)
+                                    <a href="{{ $bukti->url }}" target="_blank" rel="noopener noreferrer"
+                                        class="mt-3 inline-flex">
+                                        <img src="{{ $bukti->url }}" alt="Bukti foto penyaluran bantuan"
+                                            loading="lazy"
+                                            class="max-h-96 rounded-lg border border-slate-200 object-contain">
+                                    </a>
+                                @empty
+                                    <p class="mt-2 text-sm text-slate-500">Bukti foto belum tersedia.</p>
+                                @endforelse
+                            </div>
+                        @endif
+
                     </article>
 
                 @empty
 
-                    <div class="rounded-xl border border-slate-200 bg-white p-6 text-center shadow-sm">
+                    <div class="p-6 text-center bg-white border shadow-sm rounded-xl border-slate-200">
                         <h3 class="font-semibold text-slate-800">
                             Belum Ada Data Penyaluran
                         </h3>
@@ -259,31 +272,31 @@
                             Belum terdapat informasi penyaluran bantuan untuk data penerima ini.
                         </p>
                     </div>
-
                 @endforelse
 
             </section>
 
-            {{-- Tombol pengaduan --}}
-            <section class="rounded-xl border border-blue-100 bg-blue-50 p-5 sm:p-6">
-                <h2 class="text-lg font-bold text-slate-900">
-                    Ada kendala dengan bantuan Anda?
-                </h2>
-
-                <p class="mt-2 text-sm leading-relaxed text-slate-600">
-                    Jika terdapat masalah atau informasi yang tidak sesuai,
-                    Anda dapat menyampaikan pengaduan melalui layanan pengaduan Salurin.
-                </p>
-
-                <a href="{{ route('pengaduan.create') }}"
-                    class="mt-5 inline-flex items-center justify-center rounded-lg bg-blue-700 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800">
-                    Ajukan Pengaduan
-                </a>
-            </section>
 
         @endif
+        {{-- Tombol pengaduan --}}
+        <section class="p-5 border border-blue-100 rounded-xl bg-blue-50 sm:p-6">
+            <h2 class="text-lg font-bold text-slate-900">
+                Ada kendala dengan bantuan Anda?
+            </h2>
+
+            <p class="mt-2 text-sm leading-relaxed text-slate-600">
+                Jika terdapat masalah atau informasi yang tidak sesuai,
+                Anda dapat menyampaikan pengaduan melalui layanan pengaduan Salurin.
+            </p>
+
+            <a href="{{ route('pengaduan.create') }}"
+                class="inline-flex items-center justify-center px-5 py-3 mt-5 text-sm font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-800">
+                Ajukan Pengaduan
+            </a>
+        </section>
 
     </main>
 
 </body>
+
 </html>

@@ -121,6 +121,14 @@
                     <textarea id="note-value" rows="3" maxlength="1000" placeholder="Tambahkan catatan perubahan status..."
                         class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:ring-blue-600"></textarea>
                 </div>
+                <div id="proof-field" class="hidden">
+                    <label for="proof-image" class="mb-1 block text-sm font-semibold text-slate-700">Bukti foto
+                        pencairan</label>
+                    <input id="proof-image" type="file" accept="image/jpeg,image/png,image/webp"
+                        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-blue-50 file:px-3 file:py-1.5 file:font-semibold file:text-blue-700">
+                    <p class="mt-1 text-xs text-slate-500">Wajib saat pertama kali mengubah status menjadi Cair. Format
+                        JPG, PNG, atau WebP; maksimal 5 MB.</p>
+                </div>
                 <p id="form-error" class="hidden text-sm text-red-700" role="alert"></p>
             </div>
             <div class="flex justify-end gap-2 border-t border-slate-100 px-5 py-4">
@@ -215,13 +223,16 @@
             async function api(url, options = {}) {
                 const method = (options.method || 'GET').toUpperCase();
                 const mutating = ['POST', 'PATCH', 'PUT', 'DELETE'].includes(method);
+                const isFormData = options.body instanceof FormData;
                 const response = await fetch(url, {
                     credentials: 'same-origin',
                     ...options,
                     headers: {
                         'Accept': 'application/json',
                         ...(mutating ? {
-                            'Content-Type': 'application/json',
+                            ...(!isFormData ? {
+                                'Content-Type': 'application/json'
+                            } : {}),
                             'X-CSRF-TOKEN': csrf,
                             'X-Requested-With': 'XMLHttpRequest'
                         } : {}),
@@ -413,6 +424,7 @@
                     const history = historyResult.data || [];
                     const item = activeRecord;
                     const recipient = item.penerima || {};
+                    const proofPhotos = item.bukti_penyalurans || [];
                     $('page-title').textContent = `Detail Penyaluran #${item.id}`;
                     $('page-description').textContent = 'Informasi penerima dan perkembangan penyaluran bantuan.';
                     $('detail-container').innerHTML = `
@@ -430,6 +442,20 @@
                                 <div><dt class="text-xs text-slate-500">Tanggal penyaluran</dt><dd class="mt-1 text-sm text-slate-800">${escapeHtml(formatDate(item.tgl_penyaluran))}</dd></div>
                                 <div class="sm:col-span-2"><dt class="text-xs text-slate-500">Catatan</dt><dd class="mt-1 whitespace-pre-line text-sm text-slate-800">${escapeHtml(item.catatan || 'Belum ada catatan.')}</dd></div>
                             </dl>
+                            ${proofPhotos.length ? `
+                                <div class="mt-5 border-t border-slate-100 pt-5">
+                                    <h3 class="text-sm font-semibold text-slate-800">Bukti Foto Pencairan</h3>
+                                    <div class="mt-3 grid gap-3 sm:grid-cols-2">
+                                        ${proofPhotos.map((proof, index) => `
+                                            <a href="${escapeHtml(proof.url)}" target="_blank" rel="noopener noreferrer"
+                                                class="block overflow-hidden rounded-lg border border-slate-200">
+                                                <img src="${escapeHtml(proof.url)}" alt="Bukti foto pencairan ${index + 1}"
+                                                    loading="lazy" class="max-h-96 w-full object-contain">
+                                            </a>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
                             <div class="mt-5 flex flex-wrap gap-2">
                                 <button type="button" id="edit-status-button" class="rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">Ubah status</button>
                                 <a href="{{ route('penyaluran.page') }}" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Kembali ke daftar</a>
@@ -449,8 +475,26 @@
                 $('status-value').value = activeRecord.status_penyaluran || 'terdaftar';
                 $('date-value').value = activeRecord.tgl_penyaluran || '';
                 $('note-value').value = activeRecord.catatan || '';
+                $('proof-image').value = '';
+                const currentIndex = statuses.findIndex(item => item.key === activeRecord.status_penyaluran);
+                [...$('status-value').options].forEach(option => {
+                    const optionIndex = statuses.findIndex(item => item.key === option.value);
+                    option.disabled = currentIndex >= 0 && optionIndex < currentIndex;
+                });
+                updateProofField();
                 $('status-modal').classList.remove('hidden');
                 $('status-modal').classList.add('flex');
+            }
+
+            function updateProofField() {
+                const shouldShow = $('status-value').value === 'cair';
+                const proofRequired = shouldShow && activeRecord?.status_penyaluran !== 'cair';
+                $('proof-field').classList.toggle('hidden', !shouldShow);
+                $('proof-image').required = proofRequired;
+
+                if (!shouldShow) {
+                    $('proof-image').value = '';
+                }
             }
 
             function closeModal() {
@@ -465,15 +509,20 @@
                 save.disabled = true;
                 save.textContent = 'Menyimpan...';
                 $('form-error').classList.add('hidden');
-                const payload = {
-                    status_penyaluran: $('status-value').value,
-                    tgl_penyaluran: $('date-value').value || null,
-                    catatan: $('note-value').value.trim() || null
-                };
+                const payload = new FormData();
+                payload.append('_method', 'PATCH');
+                payload.append('status_penyaluran', $('status-value').value);
+                payload.append('tgl_penyaluran', $('date-value').value);
+                payload.append('catatan', $('note-value').value.trim());
+
+                if ($('proof-image').files[0]) {
+                    payload.append('bukti_foto', $('proof-image').files[0]);
+                }
+
                 try {
                     const result = await api(`${apiBase}/${activeRecord.id}/status`, {
-                        method: 'PATCH',
-                        body: JSON.stringify(payload)
+                        method: 'POST',
+                        body: payload
                     });
                     closeModal();
                     alertMessage(result.message || 'Status penyaluran berhasil diperbarui.');
@@ -487,6 +536,7 @@
                 }
             });
 
+            $('status-value').addEventListener('change', updateProofField);
             $('cancel-status').addEventListener('click', closeModal);
             $('status-modal').addEventListener('click', event => {
                 if (event.target === $('status-modal')) closeModal();
