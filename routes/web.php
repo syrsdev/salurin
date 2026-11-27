@@ -13,6 +13,7 @@ use App\Http\Controllers\PengaduanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicDashboardController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Dashboard\KepalaDesaPengaduanController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -51,6 +52,15 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], fu
         Route::post('/pengaduan/{pengaduan}/tanggapan', [DashboardPengaduanController::class, 'store'])
             ->middleware('throttle:20,1')
             ->name('dashboard.pengaduan.tanggapan');
+    });
+
+        Route::middleware(['role:kepala_desa'])->prefix('arahan-pengaduan')->name('kades.pengaduan.')->group(function () {
+        Route::get('/', [KepalaDesaPengaduanController::class, 'index'])->name('index');
+        Route::get('/{pengaduan}', [KepalaDesaPengaduanController::class, 'show'])->whereNumber('pengaduan')->name('show');
+        Route::post('/{pengaduan}', [KepalaDesaPengaduanController::class, 'store'])
+            ->whereNumber('pengaduan')
+            ->middleware('throttle:20,1')
+            ->name('arahan');
     });
     // Route::middleware('role:petugas')->group(function () {
 

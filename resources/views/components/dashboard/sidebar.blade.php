@@ -60,6 +60,17 @@
                     </svg>
                     <span>Persetujuan Data</span>
                 </a>
+                <a href="{{ route('kades.pengaduan.index') }}" x-on:click="sidebarOpen = false" @class([
+                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition',
+                    'bg-blue-800 text-white shadow-sm' => request()->routeIs('kades.pengaduan.*'),
+                    'text-blue-100 hover:bg-white/10 hover:text-white' => !request()->routeIs('kades.pengaduan.*'),
+                ])>
+                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.8" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 5h16v12H8l-4 3V5Z" />
+                    </svg>
+                    <span>Pengaduan Diteruskan</span>
+                </a>
             @endif
 
             @if (auth()->user()->role == 'petugas')
