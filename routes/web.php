@@ -14,6 +14,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicDashboardController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Dashboard\KepalaDesaPengaduanController;
+use App\Http\Controllers\Admin\AkunController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -31,6 +32,15 @@ Route::get('/pengaduan/sukses/{kode}', [PengaduanController::class, 'sukses'])->
 
 Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::middleware(['role:admin'])->prefix('akun')->name('akun.')->group(function () {
+        Route::get('/', [AkunController::class, 'index'])->name('index');
+        Route::get('/tambah', [AkunController::class, 'create'])->name('create');
+        Route::post('/', [AkunController::class, 'store'])->name('store');
+        Route::get('/{user}/edit', [AkunController::class, 'edit'])->whereNumber('user')->name('edit');
+        Route::put('/{user}', [AkunController::class, 'update'])->whereNumber('user')->name('update');
+        Route::patch('/{user}/status', [AkunController::class, 'ubahStatus'])->whereNumber('user')->name('status');
+    });
 
     Route::middleware(['role:petugas'])->group(function () {
         Route::resource('penerima', PenerimaController::class)->except(['show']);
