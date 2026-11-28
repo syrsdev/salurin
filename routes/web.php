@@ -34,6 +34,12 @@ Route::get('/pengaduan/sukses/{kode}', [PengaduanController::class, 'sukses'])->
 Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
+    // SCRUM-257: detail akun dan ringkasan hak akses admin.
+    Route::middleware('role:admin')->prefix('admin')->name('admin.dashboard.')->group(function () {
+        Route::get('/akun/{user}', [\App\Http\Controllers\Admin\DashboardAdminController::class, 'show'])->whereNumber('user')->name('accounts.show');
+        Route::get('/hak-akses', [\App\Http\Controllers\Admin\DashboardAdminController::class, 'access'])->name('access');
+    });
+
     Route::middleware(['role:kepala_desa'])->prefix('audit-trail')->name('audit-trail.')->group(function () {
         Route::get('/', [AuditTrailController::class, 'index'])->name('index');
         Route::get('/{auditTrail}', [AuditTrailController::class, 'show'])
