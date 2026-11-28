@@ -162,20 +162,20 @@ it('shows the kepala desa approval queue and counts only its assigned region', f
         ->assertDontSee('Penerima 14');
 });
 
-it('keeps the existing global dashboard access for administrators', function () {
-    $firstWilayahId = createDashboardRegion();
-    $secondWilayahId = createDashboardRegion();
-    $firstPetugas = createDashboardUser('petugas', $firstWilayahId);
-    $secondPetugas = createDashboardUser('petugas', $secondWilayahId);
+it('shows admin account totals and recent accounts across regions', function () {
+    $region = createDashboardRegion();
     $admin = createDashboardUser('admin', null);
+    $petugas = createDashboardUser('petugas', $region);
+    $kades = createDashboardUser('kepala_desa', $region);
+    $petugas->forceFill(['aktif' => false])->save();
 
-    createDashboardRecipient($firstPetugas->id, $firstWilayahId, 21, 'menunggu');
-    createDashboardRecipient($secondPetugas->id, $secondWilayahId, 22, 'disetujui');
-
-    $response = $this->actingAs($admin)->get(route('dashboard'));
-
-    $response->assertOk()
-        ->assertViewIs('pages.dashboard')
-        ->assertViewHas('recipientTotal', 2)
-        ->assertViewHas('scopeName', 'Seluruh wilayah');
+    $this->actingAs($admin)->get(route('dashboard'))->assertOk()
+        ->assertViewIs('pages.dashboard.admin')
+        ->assertViewHas('counts', fn ($counts) => (int) $counts->get('admin') === 1 && (int) $counts->get('petugas') === 1 && (int) $counts->get('kepala_desa') === 1)
+        ->assertViewHas('active', fn ($counts) => (int) $counts->get('petugas', 0) === 0)
+        ->assertSee($petugas->email)->assertSee('Hak Akses');
+    $this->get(route('admin.dashboard.accounts.show', $petugas))->assertOk()->assertSee($petugas->email);
+    $this->get(route('admin.dashboard.access'))->assertOk();
+    $this->actingAs($kades)->get(route('admin.dashboard.accounts.show', $petugas))->assertForbidden();
+    $this->get(route('admin.dashboard.access'))->assertForbidden();
 });

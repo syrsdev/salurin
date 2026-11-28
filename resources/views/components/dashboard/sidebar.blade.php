@@ -185,6 +185,16 @@
                         </svg>
                     <span>Kelola Akun</span>
                 </a>
+                <a href="{{ route('admin.dashboard.access') }}" x-on:click="sidebarOpen = false" @class([
+                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition',
+                    'bg-blue-800 text-white shadow-sm' => request()->routeIs('admin.dashboard.access'),
+                    'text-blue-100 hover:bg-white/10 hover:text-white' => !request()->routeIs('admin.dashboard.access'),
+                ])>
+                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6l-8-3Zm-3 9 2 2 4-4" />
+                    </svg>
+                    <span>Hak Akses</span>
+                </a>
             @endif
         </div>
     </nav>

@@ -53,6 +53,19 @@ class DemoBansosSeeder extends Seeder
             );
         }
 
+        // 2.1 Akun Admin Sistem
+        DB::table('users')->updateOrInsert(
+            ['email' => 'admin@gmail.com'],
+            [
+                'name'       => 'Admin Salurin',
+                'password'   => Hash::make('password'),
+                'role'       => 'admin',
+                'id_wilayah' => null,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]
+        );
+
         $kadesId = DB::table('users')->where('email', 'kades@sukamaju.test')->value('id');
         $petugasId = DB::table('users')->where('email', 'petugas@sukamaju.test')->value('id');
 
@@ -119,7 +132,7 @@ class DemoBansosSeeder extends Seeder
             DB::table('penerima')->updateOrInsert(
                 ['nik' => $nik],
                 [
-                    'no_kk' => '3200000000009'.str_pad((string) ($i + 1), 3, '0', STR_PAD_LEFT),
+                    'no_kk' => '3200000000009' . str_pad((string) ($i + 1), 3, '0', STR_PAD_LEFT),
                     'nama_lengkap' => $nama,
                     'alamat' => $alamat,
                     'tanggal_lahir' => $lahir,

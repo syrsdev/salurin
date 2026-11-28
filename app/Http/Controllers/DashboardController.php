@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Models\AuditTrail;
 use App\Models\Penerima;
 use App\Models\Pengaduan;
@@ -22,6 +23,10 @@ class DashboardController extends Controller
             $user instanceof User && in_array($user->role, ['petugas', 'kepala_desa', 'admin'], true),
             403
         );
+
+        if ($user->role === 'admin') {
+            return app(DashboardAdminController::class)->index($request);
+        }
 
         $wilayahId = $user->role === 'admin'
             ? null
