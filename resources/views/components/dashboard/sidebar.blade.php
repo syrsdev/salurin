@@ -60,6 +60,18 @@
                     </svg>
                     <span>Persetujuan Data</span>
                 </a>
+                <a href="{{ route('audit-trail.index') }}" x-on:click="sidebarOpen = false" @class([
+                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition',
+                    'bg-blue-800 text-white shadow-sm' => request()->routeIs('audit-trail.*'),
+                    'text-blue-100 hover:bg-white/10 hover:text-white' => !request()->routeIs('audit-trail.*'),
+                ]) @if (request()->routeIs('audit-trail.*')) aria-current="page" @endif>
+                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.8" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M4 4h16v16H4zM8 8h8M8 12h5M8 16h3M17 12v4" />
+                    </svg>
+                    <span>Audit Trail</span>
+                </a>
                 <a href="{{ route('kades.pengaduan.index') }}" x-on:click="sidebarOpen = false" @class([
                     'flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition',
                     'bg-blue-800 text-white shadow-sm' => request()->routeIs('kades.pengaduan.*'),

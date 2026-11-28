@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\PenyaluranTambahController;
 use App\Http\Controllers\Api\PeriodeController;
 use App\Http\Controllers\CekStatusBantuanController;
 use App\Http\Controllers\Dashboard\PengaduanController as DashboardPengaduanController;
+use App\Http\Controllers\Dashboard\AuditTrailController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JenisBantuanController;
 use App\Http\Controllers\PenerimaController;
@@ -32,6 +33,13 @@ Route::get('/pengaduan/sukses/{kode}', [PengaduanController::class, 'sukses'])->
 
 Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::middleware(['role:kepala_desa'])->prefix('audit-trail')->name('audit-trail.')->group(function () {
+        Route::get('/', [AuditTrailController::class, 'index'])->name('index');
+        Route::get('/{auditTrail}', [AuditTrailController::class, 'show'])
+            ->whereNumber('auditTrail')
+            ->name('show');
+    });
 
     Route::middleware(['role:admin'])->prefix('akun')->name('akun.')->group(function () {
         Route::get('/', [AkunController::class, 'index'])->name('index');

@@ -119,7 +119,7 @@ class PenerimaController extends Controller
                 'dibuat_oleh' => $user->id,
             ]));
 
-            AuditTrail::catat('penerima', $penerima->id, 'create', null, $penerima->only(['status_data']));
+            AuditTrail::catat('penerima', $penerima->id, 'create', null, $this->auditSnapshot($penerima));
         });
 
         return redirect()->route('penerima.index')->with('success', 'Data penerima berhasil ditambahkan.');
@@ -145,7 +145,7 @@ class PenerimaController extends Controller
         $data = $this->validatedData($request, $user, $penerima);
 
         DB::transaction(function () use ($data, $penerima, $user): void {
-            $oldData = $penerima->only(['status_data']);
+            $oldData = $this->auditSnapshot($penerima);
             $penerima->update(array_merge($data, [
                 'id_wilayah' => $user->id_wilayah,
             ]));
@@ -155,7 +155,7 @@ class PenerimaController extends Controller
                 $penerima->id,
                 'update',
                 $oldData,
-                $penerima->only(['status_data'])
+                $this->auditSnapshot($penerima)
             );
         });
 
@@ -172,7 +172,10 @@ class PenerimaController extends Controller
                 ->with('error', 'Data penerima sudah digunakan pada penyaluran dan tidak dapat dihapus.');
         }
 
-        $penerima->delete();
+        DB::transaction(function () use ($penerima): void {
+            AuditTrail::catat('penerima', $penerima->id, 'delete', $this->auditSnapshot($penerima), null);
+            $penerima->delete();
+        });
 
         return redirect()->route('penerima.index')->with('success', 'Data penerima berhasil dihapus.');
     }
@@ -203,6 +206,26 @@ class PenerimaController extends Controller
             'tanggal_lahir.before_or_equal' => 'Tanggal lahir tidak boleh melebihi hari ini.',
             'id_wilayah.required' => 'Wilayah wajib dipilih.',
             'id_wilayah.in' => 'Wilayah harus sesuai dengan wilayah tugas Anda.',
+        ]);
+    }
+
+    /**
+     * Snapshot perubahan penerima untuk Audit Trail.
+     * NIK disimpan pada audit dan disamarkan saat ditampilkan ke pengguna.
+     *
+     * @return array<string, mixed>
+     */
+    private function auditSnapshot(Penerima $penerima): array
+    {
+        return $penerima->only([
+            'nik',
+            'no_kk',
+            'nama_lengkap',
+            'alamat',
+            'tanggal_lahir',
+            'status_data',
+            'alasan_penolakan',
+            'id_wilayah',
         ]);
     }
 

@@ -15,7 +15,14 @@ use Illuminate\Support\Facades\DB;
 class PenerimaPersetujuanController extends Controller
 {
     // Kolom yang dicatat ke audit trail.
-    private const KOLOM_AUDIT = ['status_data', 'alasan_penolakan', 'tgl_disetujui', 'disetujui_oleh'];
+    private const KOLOM_AUDIT = [
+        'nik',
+        'nama_lengkap',
+        'status_data',
+        'alasan_penolakan',
+        'tgl_disetujui',
+        'disetujui_oleh',
+    ];
 
     public function index(Request $request): JsonResponse
     {
